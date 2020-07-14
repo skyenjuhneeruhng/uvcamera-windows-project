@@ -25,35 +25,50 @@ int main()
 	}
 	UVCCameraLibrary lib;
 	char devname[256];
-	strcpy_s(devname , "HD Camera");
+	strcpy_s(devname , "PTZ Pro 2");
 	if (lib.connectDevice(devname))
 	{
 		
-		HRESULT hr;
-		hr = lib.movePanOneLeft(5);
-		/*hr = lib.moveTiltOneTop(5);
-		if (SUCCEEDED(hr))
-			printf("Successed\n");
-		hr = lib.zoomOneIn(5);
-		if (SUCCEEDED(hr))
-			printf("Successed\n");
-		hr = lib.focusOneIn(5);
-		if (SUCCEEDED(hr))
-			printf("Successed\n");
+		char a = 'a';
+		scanf_s("enter a to test \n %c", &a);
+		printf_s("entered character is %c", a);
+		if (a == 'a')
+		{
+			HRESULT hr;
+			hr = lib.zoomOneIn(2);
+			//hr = lib.moveHome();
+			/*hr = lib.moveTiltOneTop(5);
+			if (SUCCEEDED(hr))
+				printf("Successed\n");
+			hr = lib.zoomOneIn(5);
+			if (SUCCEEDED(hr))
+				printf("Successed\n");
+			hr = lib.focusOneIn(5);
+			if (SUCCEEDED(hr))
+				printf("Successed\n");
 
-		hr = lib.moveHome();
-		if(SUCCEEDED(hr))
-			printf("Successed\n");
+			hr = lib.moveHome();
+			if(SUCCEEDED(hr))
+				printf("Successed\n");
+
+			printf("pan %d, tilt %d, zoom %d, focus %d\n", lib.getPan(), lib.getTilt(), lib.getZoom(), lib.getFocus());
+			lib.setAutoFocus(false);
+			if (lib.getAutoFocus())
+				printf("Focus Auto\n");
+			lib.setAutoFocus(true);
+			if (lib.getAutoFocus())
+				printf("Focus Auto\n");
+			hr = lib.zoomOneIn(1000);*/
+		}
+		else
+		{
+			printf_s("wrong character has been entered");
+		}
 		
-		printf("pan %d, tilt %d, zoom %d, focus %d\n", lib.getPan(), lib.getTilt(), lib.getZoom(), lib.getFocus());
-		lib.setAutoFocus(false);
-		if (lib.getAutoFocus())
-			printf("Focus Auto\n");
-		lib.setAutoFocus(true);
-		if (lib.getAutoFocus())
-			printf("Focus Auto\n");
-		hr = lib.zoomOneIn(1000);*/
-		
+	}
+	else
+	{
+		printf_s("Can not connect device");
 	}
 
 	char a = 0;

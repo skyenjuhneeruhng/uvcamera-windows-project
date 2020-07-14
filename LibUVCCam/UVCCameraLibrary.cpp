@@ -570,7 +570,13 @@ HRESULT anglueDownRight(int pan, int tilt)
 */
 HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE , zoom);
+	//continuous zooming in
+	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE , zoom);
+	//absolute zooming in once
+	long zoomVal = getZoom();
+	long panVal = getPan();
+	long tiltVal = getTilt();
+	return moveTo(panVal, tiltVal, zoomVal + zoom);
 }
 /*
 * zoom out one step
@@ -579,7 +585,13 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 */
 HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, -zoom);
+	//continous zooming out
+	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, -zoom);
+	//absolute zooming out once
+	long zoomVal = getZoom();
+	long panVal = getPan();
+	long tiltVal = getTilt();
+	return moveTo(panVal, tiltVal, zoomVal - zoom);
 }
 /*
 * focus in one step
@@ -877,9 +889,15 @@ long UVCCameraLibrary::getVal(CameraControlProperty prop)
 	{
 		long Min, Max, Step, Default, Flags, Val;
 
+		if (prop == CameraControl_Zoom)
+			printf("Zoom ...");
+		else
+			printf("No zoom ...");
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
+		printf("Min %d , Max %d , Step %d", Min, Max, Step);
 		hr = pCameraControl->Get(prop, &Val, &Flags);
+		printf("required value is %li \n", Val);
 		if (pCameraControl != NULL)
 			pCameraControl->Release();
 		if (SUCCEEDED(hr))
@@ -932,7 +950,7 @@ HRESULT UVCCameraLibrary::stopControling(KSPROPERTY_VIDCAP_CAMERACONTROL prop)
 		}
 		else
 		{
-			printf("This device does not support PTZControl\n");
+			printf("Stop Controlling: This device does not support PTZControl\n");
 		}
 	}
 	if (pCameraControl != NULL)

@@ -1,9 +1,14 @@
 ﻿  pch.cpp
   LibraryTester.cpp
-G:\CWorks\UVCCameraDLL\LibUVCCamSln\LibraryTester\LibraryTester.cpp(60,16): warning C4474: 'scanf_s' : too many arguments passed for format string
-G:\CWorks\UVCCameraDLL\LibUVCCamSln\LibraryTester\LibraryTester.cpp(60,16): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+c:\developer-ptzoptics\uvcamera-windows-project\libuvccam\uvccameralibrary.h(216): warning C4251: 'UVCCameraLibrary::uvcxu': class 'UVCXU' needs to have dll-interface to be used by clients of class 'UVCCameraLibrary'
+  c:\developer-ptzoptics\uvcamera-windows-project\libuvccam\uvccameralibrary.h(82): note: see declaration of 'UVCXU'
+c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(33): warning C4473: 'scanf_s' : not enough arguments passed for format string
+  c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(33): note: placeholders and their parameters expect 2 variadic arguments, but 1 were provided
+  c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(33): note: the missing variadic argument 2 is required by format string '%c'
+  c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(33): note: this argument is used as a buffer size
+c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(75): warning C4474: 'scanf_s' : too many arguments passed for format string
+  c:\developer-ptzoptics\uvcamera-windows-project\librarytester\librarytester.cpp(75): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 8 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 10 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  LibraryTester.vcxproj -> G:\CWorks\UVCCameraDLL\LibUVCCamSln\x64\Release\LibraryTester.exe
+  LibraryTester.vcxproj -> C:\Developer-PTZOptics\uvcamera-windows-project\x64\Release\LibraryTester.exe
