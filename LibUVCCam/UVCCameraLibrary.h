@@ -216,16 +216,16 @@ private:
 	void getEnumMoniker();
 
 	//change the property of camera according to @prop
-	HRESULT moveCamera(KSPROPERTY_VIDCAP_CAMERACONTROL prop , int step);
+	HRESULT moveCamera(long prop , int step);
 	//stop change of the property
-	HRESULT stopControling(KSPROPERTY_VIDCAP_CAMERACONTROL prop);
-	HRESULT stopAbsControling(CameraControlProperty ctrlProp);
+	HRESULT stopControling(long prop);
+	HRESULT stopAbsControling(long ctrlProp);
 
 	//get Auto/Manual status of property
-	bool getAuto(CameraControlProperty prop);
+	bool getAuto(long prop);
 	
 	//get value of the property
-	long getVal(CameraControlProperty prop);
+	long getVal(long prop);
 
 	//the range of the pan, tilt, zoom
 	uvc_ranges_t panRange;

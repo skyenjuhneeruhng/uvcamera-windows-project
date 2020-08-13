@@ -35,7 +35,10 @@ int main()
 		if (a == 'a')
 		{
 			HRESULT hr;
-			hr = lib.zoomOneIn(2);
+			for(int i = 0 ; i < 10 ; i ++)
+				hr = lib.zoomOneIn(10);
+			//for (int i = 0; i < 50000; i++);
+			//hr = lib.zoomOneIn(10);
 			//hr = lib.moveHome();
 			/*hr = lib.moveTiltOneTop(5);
 			if (SUCCEEDED(hr))

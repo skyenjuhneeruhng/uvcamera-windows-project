@@ -621,9 +621,14 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 	//return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
 
 	long panVal = getPan();
+	//printf("pan value before zooming %d\n", panVal);
 	long tiltVal = getTilt();
+	//printf("tilt value before zooming %d\n", tiltVal);
 	long focusVal = getFocus();
-	return moveTo(panVal, tiltVal, zoomRange.Max, focusVal);
+	//printf("focus value before zooming %d\n", focusVal);
+	long zoomVal = getZoom();
+	//printf("zoom value before zooming %d\n", zoomVal);
+	return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
 }
 /*
 * zoom out one step
@@ -649,7 +654,9 @@ HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 	long panVal = getPan();
 	long tiltVal = getTilt();
 	long focusVal = getFocus();
-	return moveTo(panVal, tiltVal, zoomRange.Min, focusVal);
+	long zoomVal = getZoom();
+	//printf("zoom value before zooming %d", zoomVal);
+	return moveTo(panVal, tiltVal, zoomVal - zoom, focusVal);
 }
 /*
 * focus in one step
@@ -665,7 +672,8 @@ HRESULT UVCCameraLibrary::focusOneIn(int focus)
 	long panVal = getPan();
 	long tiltVal = getTilt();
 	long zoomVal = getZoom();
-	return moveTo(panVal, tiltVal, zoomVal, focusRange.Max);
+	long focusVal = getFocus();
+	return moveTo(panVal, tiltVal, zoomVal, focusVal + focus);
 }
 /*
 * focus out one step
@@ -681,7 +689,8 @@ HRESULT UVCCameraLibrary::focusOneOut(int focus)
 	long panVal = getPan();
 	long tiltVal = getTilt();
 	long zoomVal = getZoom();
-	return moveTo(panVal, tiltVal, zoomVal, focusRange.Min);
+	long focusVal = getFocus();
+	return moveTo(panVal, tiltVal, zoomVal, focusVal - focus);
 }
 /*
 * set fucus mode
@@ -690,7 +699,7 @@ HRESULT UVCCameraLibrary::focusOneOut(int focus)
 */
 HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 {
-	stopFocusing();
+	//stopFocusing();
 	HRESULT hr = E_FAIL;
 
 	if (pDeviceFilter == NULL)
@@ -716,10 +725,12 @@ HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 				hr = pCameraControl->Set(CameraControl_Focus, Val , CameraControl_Flags_Auto);
 			else
 				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Manual);
+			if (FAILED(hr))
+				printf("This device does not support focus auto control\n");
 		}
 		else
 		{
-			printf("This device does not support PTZControl\n");
+			printf("Can not get focus range of this device\n");
 		}
 
 	}
@@ -734,7 +745,7 @@ HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 * Use KSPROPERTIES for continuous movement
 * @return: if success returns S_OK
 */
-HRESULT UVCCameraLibrary::moveCamera(KSPROPERTY_VIDCAP_CAMERACONTROL prop, int step)
+HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 {
 	HRESULT hr = E_FAIL;
 
@@ -754,14 +765,35 @@ HRESULT UVCCameraLibrary::moveCamera(KSPROPERTY_VIDCAP_CAMERACONTROL prop, int s
 
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		printf("Min %d , Max %d , Step %d", Min, Max , Step);
+		//printf("Min %d , Max %d , Step %d", Min, Max , Step);
 		if (SUCCEEDED(hr))
 		{
 			hr = pCameraControl->Set(prop, step, CameraControl_Flags_Manual);
+			if (FAILED(hr))
+			{
+				switch (prop)
+				{
+				case KSPROPERTY_CAMERACONTROL_PAN_RELATIVE:
+					printf("This device does not support pan continuous control\n");
+					break;
+				case KSPROPERTY_CAMERACONTROL_TILT_RELATIVE:
+					printf("This device does not support tilt continuous control\n");
+					break;
+				case KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE:
+					printf("This device does not support zoom continuous control\n");
+					break;
+				case KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE:
+					printf("This device does not support focus continuous control\n");
+					break;
+				default:
+					printf("This device does not support continuous control KSPROPERTY: %d\n", prop);
+					break;
+				}
+			}
 		}
 		else
 		{
-			printf("This device does not support PTZControl\n");
+			printf("Can not get range of this device\n");
 		}
 	}
 	if (pCameraControl != NULL)
@@ -785,9 +817,9 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	hr = stopMoving();
-	hr = stopZooming();
-	hr = stopFocusing();
+	//hr = stopMoving();
+	//hr = stopZooming();
+	//hr = stopFocusing();
 	IAMCameraControl *pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
@@ -816,6 +848,8 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 
 		long Val, Flags;
 		hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
+		if (FAILED(hr))
+			printf("This device does not support focus auto/manual control\n");
 		long focusFlag = Flags;
 		long focusVal = Val;
 		focus += focusRange.Min;
@@ -824,22 +858,27 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 		if (focus > focusRange.Max)
 			focus = focusRange.Max;
 
-		if (SUCCEEDED(hr))
+
+		//use CameraControl_Pan, Tilt, Zoom for absolute movement
+		hr = pCameraControl->Set(CameraControl_Pan, pan, CameraControl_Flags_Manual);
+		if(FAILED(hr))
+			printf("This device does not support pan absolute control\n");
+
+		hr = pCameraControl->Set(CameraControl_Tilt, tilt, CameraControl_Flags_Manual);
+		if (FAILED(hr))
+			printf("This device does not support tilt absolute control\n");
+
+		hr = pCameraControl->Set(CameraControl_Zoom, zoom, CameraControl_Flags_Manual);
+		if (FAILED(hr))
+			printf("This device does not support zoom absolute control\n");
+
+		if (focusFlag != CameraControl_Flags_Auto)
 		{
-			//use CameraControl_Pan, Tilt, Zoom for absolute movement
-			hr = pCameraControl->Set(CameraControl_Pan, pan, CameraControl_Flags_Manual);
-
-			hr = pCameraControl->Set(CameraControl_Tilt, tilt, CameraControl_Flags_Manual);
-
-			hr = pCameraControl->Set(CameraControl_Zoom, zoom, CameraControl_Flags_Manual);
-
-			if (focusFlag != CameraControl_Flags_Auto)
-				hr = pCameraControl->Set(CameraControl_Focus, focus, CameraControl_Flags_Manual);
+			hr = pCameraControl->Set(CameraControl_Focus, focus, CameraControl_Flags_Manual);
+			if (FAILED(hr))
+				printf("This device does not support focus absolute control\n");
 		}
-		else
-		{
-			printf("This device does not support PTZControl\n");
-		}
+		
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
@@ -852,9 +891,9 @@ HRESULT UVCCameraLibrary::moveHome()
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	hr = stopMoving();
-	hr = stopZooming();
-	hr = stopFocusing();
+	//hr = stopMoving();
+	//hr = stopZooming();
+	//hr = stopFocusing();
 	IAMCameraControl *pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
@@ -868,21 +907,28 @@ HRESULT UVCCameraLibrary::moveHome()
 		long Flags, Val;
 
 		hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
+		if (FAILED(hr))
+			printf("This device does not support focus auto/manual control\n");
 		long focusFlag = Flags;
 		long focusVal = Val;
-		if (SUCCEEDED(hr))
-		{
-			hr = pCameraControl->Set(CameraControl_Pan, panRange.Default, CameraControl_Flags_Manual);
 
-			hr = pCameraControl->Set(CameraControl_Tilt, tiltRange.Default, CameraControl_Flags_Manual);
+		hr = pCameraControl->Set(CameraControl_Pan, panRange.Default, CameraControl_Flags_Manual);
+		if (FAILED(hr))
+			printf("This device does not support pan absolute control\n");
 
-			hr = pCameraControl->Set(CameraControl_Zoom, zoomRange.Default, CameraControl_Flags_Manual);
-			if (focusFlag != CameraControl_Flags_Auto)
-				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Auto);
-		}
-		else
+		hr = pCameraControl->Set(CameraControl_Tilt, tiltRange.Default, CameraControl_Flags_Manual);
+		if (FAILED(hr))
+			printf("This device does not support tilt absolute control\n");
+
+		hr = pCameraControl->Set(CameraControl_Zoom, zoomRange.Default, CameraControl_Flags_Manual);
+		if (FAILED(hr))
+			printf("This device does not support zoom absolute control\n");
+
+		if (focusFlag != CameraControl_Flags_Auto)
 		{
-			printf("This device does not support PTZControl\n");
+			hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Auto);
+			if (FAILED(hr))
+				printf("This device does not support focus auto/manual control\n");
 		}
 	}
 	if (pCameraControl != NULL)
@@ -911,7 +957,7 @@ long UVCCameraLibrary::getFocus()
 	return getVal(CameraControl_Focus);
 }
 
-bool UVCCameraLibrary::getAuto(CameraControlProperty prop)
+bool UVCCameraLibrary::getAuto(long prop)
 {
 	HRESULT hr = E_FAIL;
 
@@ -951,7 +997,7 @@ bool UVCCameraLibrary::getAuto(CameraControlProperty prop)
 	}
 	
 }
-long UVCCameraLibrary::getVal(CameraControlProperty prop)
+long UVCCameraLibrary::getVal(long prop)
 {
 	HRESULT hr = E_FAIL;
 
@@ -972,15 +1018,15 @@ long UVCCameraLibrary::getVal(CameraControlProperty prop)
 	{
 		long Min, Max, Step, Default, Flags, Val;
 
-		if (prop == CameraControl_Zoom)
-			printf("Zoom ...");
-		else
-			printf("No zoom ...");
+		//if (prop == CameraControl_Zoom)
+		//	printf("Zoom ...");
+		//else
+		//	printf("No zoom ...");
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		printf("Min %d , Max %d , Step %d", Min, Max, Step);
+		//printf("Min %d , Max %d , Step %d", Min, Max, Step);
 		hr = pCameraControl->Get(prop, &Val, &Flags);
-		printf("required value is %li \n", Val);
+		//printf("required value is %li \n", Val);
 		if (pCameraControl != NULL)
 			pCameraControl->Release();
 		if (SUCCEEDED(hr))
@@ -1002,7 +1048,7 @@ HRESULT UVCCameraLibrary::stopMoving()
 }
 HRESULT UVCCameraLibrary::stopZooming()
 {
-	//return stopControling(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE);
+	return stopControling(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE);
 	/*
 	long panVal = getPan();
 	long tiltVal = getTilt();
@@ -1010,13 +1056,13 @@ HRESULT UVCCameraLibrary::stopZooming()
 	long zoomVal = getZoom();
 	return moveTo(panVal, tiltVal, focusVal, zoomVal);
 	*/
-	long zoomVal = getZoom();
-	printf("current zoom : %d", zoomVal);
-	return stopAbsControling(CameraControl_Zoom);
+	//long zoomVal = getZoom();
+	//printf("current zoom : %d", zoomVal);
+	//return stopAbsControling(CameraControl_Zoom);
 }
 HRESULT UVCCameraLibrary::stopFocusing()
 {
-	//return stopControling(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE);
+	return stopControling(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE);
 	/*
 	long panVal = getPan();
 	long tiltVal = getTilt();
@@ -1024,10 +1070,10 @@ HRESULT UVCCameraLibrary::stopFocusing()
 	long zoomVal = getZoom();
 	return moveTo(panVal, tiltVal, focusVal, zoomVal);
 	*/
-	return stopAbsControling(CameraControl_Focus);
+	//return stopAbsControling(CameraControl_Focus);
 }
 
-HRESULT UVCCameraLibrary::stopControling(KSPROPERTY_VIDCAP_CAMERACONTROL prop)
+HRESULT UVCCameraLibrary::stopControling(long prop)
 {
 	HRESULT hr = E_FAIL;
 
@@ -1063,7 +1109,7 @@ HRESULT UVCCameraLibrary::stopControling(KSPROPERTY_VIDCAP_CAMERACONTROL prop)
 	return hr;
 }
 
-HRESULT UVCCameraLibrary::stopAbsControling(CameraControlProperty prop)
+HRESULT UVCCameraLibrary::stopAbsControling(long prop)
 {
 	HRESULT hr = E_FAIL;
 
