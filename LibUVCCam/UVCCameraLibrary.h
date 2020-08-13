@@ -34,6 +34,13 @@ DEFINE_GUIDSTRUCT("3C16A808-701C-49C7-AF98-2EC6C125B963", PROPSETID_XU_PLUG_IN);
 DEFINE_GUIDSTRUCT("661DCD8C-ADB0-B344-8CB4-D335115FC18C", PROPSETID_XU_PLUG_IN_1700U);
 #define PROPSETID_XU_PLUG_IN_1700U DEFINE_GUIDNAMED(PROPSETID_XU_PLUG_IN_1700U)
 
+//some camera pid
+#define USB_PID_V61U (0x0605)
+#define USB_PID_V60U (0x0606)
+#define USB_PID_1702C_84 (0x0735)  
+#define USB_PID_1702C_120 (0x0737) //PTZ Pro 2
+#define USB_PID_1700U_120 (0x1000)
+
 
 #ifndef ASSERT
 #define ASSERT(_x_) ((void)0)
@@ -77,6 +84,12 @@ typedef enum {
 	UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE,
 
 }uvc_17002c_xu_plug_in_id_t;
+
+typedef struct  {
+	long Min;
+	long Max;
+	long Default;
+}uvc_ranges_t;
 
 
 class UVCXU// : public IKsNodeControl
@@ -162,7 +175,7 @@ public:
 	//home
 	HRESULT moveHome();
 	//move to absolute position
-	HRESULT moveTo(int pan, int tilt, int zoom);
+	HRESULT moveTo(int pan, int tilt, int zoom, int focus);
 	//set auto/manual of focus
 	HRESULT setAutoFocus(bool af);
 	//stop moving, zooming, focusing
@@ -206,11 +219,27 @@ private:
 	HRESULT moveCamera(KSPROPERTY_VIDCAP_CAMERACONTROL prop , int step);
 	//stop change of the property
 	HRESULT stopControling(KSPROPERTY_VIDCAP_CAMERACONTROL prop);
+	HRESULT stopAbsControling(CameraControlProperty ctrlProp);
 
 	//get Auto/Manual status of property
 	bool getAuto(CameraControlProperty prop);
+	
 	//get value of the property
 	long getVal(CameraControlProperty prop);
+
+	//the range of the pan, tilt, zoom
+	uvc_ranges_t panRange;
+	uvc_ranges_t tiltRange;
+	uvc_ranges_t zoomRange;
+	uvc_ranges_t focusRange;
+
+	//product id - this is required because some controls does not work properly based on product id
+	//for example continuous zooming does not work for PTZ Pro 2(
+	int pid;
+
+	//get ptz control ranges
+	HRESULT getControlRanges();
+
 
 	/*OSD Menu*/
 	UVCXU uvcxu;
