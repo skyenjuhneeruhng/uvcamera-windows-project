@@ -25,7 +25,7 @@ int main()
 	}
 	UVCCameraLibrary lib;
 	char devname[256];
-	strcpy_s(devname , "PTZ Pro 2");
+	strcpy_s(devname , "PTZ Optics Camera");//PTZ Optics Camera//OBS Virtual Camera
 	if (lib.connectDevice(devname))
 	{
 		

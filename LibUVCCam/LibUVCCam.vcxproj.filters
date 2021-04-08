@@ -24,6 +24,9 @@
     <ClInclude Include="UVCCameraLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UVCUX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UVCCameraLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UVCUX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

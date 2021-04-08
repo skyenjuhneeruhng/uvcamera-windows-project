@@ -1,305 +1,6 @@
 #include "stdafx.h"
 #include "UVCCameraLibrary.h"
 
-/**********************************************Implementation of UVCXU class*********************************************************/
-UVCXU::UVCXU()
-{
-	SAFE_RELEASE(m_pKsControl);
-	m_pKsControl = NULL;
-	m_dwNodeId = 0;
-	UvcXuGudi = { 0 };
-}
-
-UVCXU::~UVCXU()
-{
-	SAFE_RELEASE(m_pKsControl);
-}
-
-
-
-HRESULT
-UVCXU::QueryUvcXuInterface(
-	IBaseFilter* pDeviceFilter,
-	GUID extensionGuid,
-	DWORD FirstNodeId)
-{
-	HRESULT hr = S_OK;
-	IKsTopologyInfo* pIksTopologyInfo = NULL;
-	DWORD numberOfNodes;
-	KSP_NODE ExtensionProp;
-
-	if (pDeviceFilter == NULL)
-		return E_POINTER;
-
-
-	hr = pDeviceFilter->QueryInterface(__uuidof(IKsTopologyInfo), (void**)&pIksTopologyInfo);
-	if (FAILED(hr))
-		return hr;
-
-
-	hr = pIksTopologyInfo->get_NumNodes(&numberOfNodes);
-	if (FAILED(hr) || numberOfNodes == 0)
-	{
-		SAFE_RELEASE(pIksTopologyInfo);
-		return E_FAIL;
-	}
-
-	DWORD i = 0, j = 0;
-	GUID nodeGuid;
-	if (FirstNodeId < numberOfNodes)
-		i = FirstNodeId;
-
-	for (; i < numberOfNodes; i++)
-	{
-		if (SUCCEEDED(pIksTopologyInfo->get_NodeType(i, &nodeGuid)))
-		{
-			if (IsEqualGUID(KSNODETYPE_DEV_SPECIFIC, nodeGuid))
-			{
-#if _DEBUG
-				printf("found one xu node, NodeId = %d\n", i);
-#endif
-				SAFE_RELEASE(m_pKsControl);
-				m_pKsControl = NULL;
-				hr = pIksTopologyInfo->CreateNodeInstance(i, IID_IKsControl, (void**)&m_pKsControl);
-				if (SUCCEEDED(hr))
-				{
-					ULONG ulBytesReturned;
-					ExtensionProp.Property.Set = extensionGuid;
-					ExtensionProp.Property.Id = KSPROPERTY_EXTENSION_UNIT_INFO;
-					ExtensionProp.Property.Flags = KSPROPERTY_TYPE_SETSUPPORT | KSPROPERTY_TYPE_TOPOLOGY;
-					ExtensionProp.NodeId = i;
-					ExtensionProp.Reserved = 0;
-
-					hr = m_pKsControl->KsProperty(
-						(PKSPROPERTY)&ExtensionProp,
-						sizeof(ExtensionProp),
-						NULL,
-						0,
-						&ulBytesReturned);
-
-					if (hr == S_OK)
-					{
-#if _DEBUG						
-						printf("CreateNodeInstance NodeId = %d\n", i);
-#endif
-						m_dwNodeId = i;
-						UvcXuGudi = extensionGuid;
-						return hr;
-					}
-				}
-				else
-				{
-#if _DEBUG
-					printf("CreateNodeInstance failed - 0x%x, NodeId = %d\n", hr, i);
-#endif
-				}
-			}
-		}
-
-	}
-
-	if (i == numberOfNodes)
-	{	// Did not find the node
-		SAFE_RELEASE(m_pKsControl);
-		m_pKsControl = NULL;
-		hr = E_FAIL;
-	}
-
-	SAFE_RELEASE(pIksTopologyInfo);
-	return hr;
-}
-
-HRESULT
-UVCXU::FinalConstruct()
-{
-	if (m_pKsControl == NULL) return E_FAIL;
-	return S_OK;
-}
-
-HRESULT
-UVCXU::get_InfoSize(
-	ULONG* pulSize)
-{
-	HRESULT hr = S_OK;
-	ULONG ulBytesReturned;
-	KSP_NODE ExtensionProp;
-
-	if (!pulSize || m_pKsControl == NULL) return E_POINTER;
-
-	ExtensionProp.Property.Set = UvcXuGudi;
-	ExtensionProp.Property.Id = KSPROPERTY_EXTENSION_UNIT_INFO;
-	ExtensionProp.Property.Flags = KSPROPERTY_TYPE_GET |
-		KSPROPERTY_TYPE_TOPOLOGY;
-	ExtensionProp.NodeId = m_dwNodeId;
-
-	hr = m_pKsControl->KsProperty(
-		(PKSPROPERTY)&ExtensionProp,
-		sizeof(ExtensionProp),
-		NULL,
-		0,
-		&ulBytesReturned);
-
-	if (hr == HRESULT_FROM_WIN32(ERROR_MORE_DATA))
-	{
-		*pulSize = ulBytesReturned;
-		hr = S_OK;
-	}
-
-	return hr;
-}
-
-
-HRESULT
-UVCXU::get_Info(
-	ULONG ulSize,
-	BYTE pInfo[])
-{
-	HRESULT hr = S_OK;
-	KSP_NODE ExtensionProp;
-	ULONG ulBytesReturned;
-
-	if (m_pKsControl == NULL) return E_POINTER;
-
-	ExtensionProp.Property.Set = UvcXuGudi;
-	ExtensionProp.Property.Id = KSPROPERTY_EXTENSION_UNIT_INFO;
-	ExtensionProp.Property.Flags = KSPROPERTY_TYPE_GET |
-		KSPROPERTY_TYPE_TOPOLOGY;
-	ExtensionProp.NodeId = m_dwNodeId;
-
-	hr = m_pKsControl->KsProperty(
-		(PKSPROPERTY)&ExtensionProp,
-		sizeof(ExtensionProp),
-		(PVOID)pInfo,
-		ulSize,
-		&ulBytesReturned);
-
-	return hr;
-}
-
-
-HRESULT
-UVCXU::get_PropertySize(
-	ULONG PropertyId,
-	ULONG* pulSize)
-{
-	HRESULT hr = S_OK;
-	ULONG ulBytesReturned;
-	KSP_NODE ExtensionProp;
-
-	if (!pulSize || m_pKsControl == NULL) return E_POINTER;
-
-	ExtensionProp.Property.Set = UvcXuGudi;
-	ExtensionProp.Property.Id = PropertyId;
-	ExtensionProp.Property.Flags = KSPROPERTY_TYPE_GET |
-		KSPROPERTY_TYPE_TOPOLOGY;
-	ExtensionProp.NodeId = m_dwNodeId;
-
-	hr = m_pKsControl->KsProperty(
-		(PKSPROPERTY)&ExtensionProp,
-		sizeof(ExtensionProp),
-		NULL,
-		0,
-		&ulBytesReturned);
-
-	if (hr == HRESULT_FROM_WIN32(ERROR_MORE_DATA))
-	{
-		*pulSize = ulBytesReturned;
-		hr = S_OK;
-	}
-
-	return hr;
-}
-
-HRESULT
-UVCXU::get_Property(
-	ULONG PropertyId,
-	ULONG ulSize,
-	BYTE pValue[])
-{
-	HRESULT hr = S_OK;
-	KSP_NODE ExtensionProp;
-	ULONG ulBytesReturned;
-
-	if (m_pKsControl == NULL) return E_POINTER;
-
-	ExtensionProp.Property.Set = UvcXuGudi;
-	ExtensionProp.Property.Id = PropertyId;
-	ExtensionProp.Property.Flags = KSPROPERTY_TYPE_GET |
-		KSPROPERTY_TYPE_TOPOLOGY;
-	ExtensionProp.NodeId = m_dwNodeId;
-	ExtensionProp.Reserved = 0;
-
-	hr = m_pKsControl->KsProperty(
-		(PKSPROPERTY)&ExtensionProp,
-		sizeof(ExtensionProp),
-		(PVOID)pValue,
-		ulSize,
-		&ulBytesReturned);
-
-	if (ulSize != ulBytesReturned)
-		return E_FAIL;
-
-	return hr;
-}
-
-HRESULT
-UVCXU::put_Property(
-	ULONG PropertyId,
-	ULONG ulSize,
-	BYTE pValue[])
-{
-	HRESULT hr = S_OK;
-	KSP_NODE ExtensionProp;
-	ULONG ulBytesReturned;
-
-	if (m_pKsControl == NULL) return E_POINTER;
-
-	ExtensionProp.Property.Set = UvcXuGudi;
-	ExtensionProp.Property.Id = PropertyId;
-	ExtensionProp.Property.Flags = KSPROPERTY_TYPE_SET |
-		KSPROPERTY_TYPE_TOPOLOGY;
-	ExtensionProp.NodeId = m_dwNodeId;
-	ExtensionProp.Reserved = 0;
-
-	hr = m_pKsControl->KsProperty(
-		(PKSPROPERTY)&ExtensionProp,
-		sizeof(ExtensionProp),
-		(PVOID)pValue,
-		ulSize,
-		&ulBytesReturned);
-
-	return hr;
-}
-
-typedef struct {
-	KSPROPERTY_MEMBERSHEADER    MembersHeader;
-	const VOID* Members;
-} KSPROPERTY_MEMBERSLIST, * PKSPROPERTY_MEMBERSLIST;
-
-typedef struct {
-	KSIDENTIFIER                    PropTypeSet;
-	ULONG                           MembersListCount;
-	_Field_size_(MembersListCount)
-		const KSPROPERTY_MEMBERSLIST* MembersList;
-} KSPROPERTY_VALUES, * PKSPROPERTY_VALUES;
-
-HRESULT
-UVCXU::get_PropertyRange(
-	ULONG PropertyId,
-	ULONG ulSize,
-	BYTE pMin[],
-	BYTE pMax[],
-	BYTE pSteppingDelta[],
-	BYTE pDefault[])
-{
-	if (m_pKsControl == NULL) return E_POINTER;
-
-	// IHV may add code here, current stub just returns S_OK
-	HRESULT hr = S_OK;
-	return hr;
-}
-
-/************************************************************End of UVCXU class******************************************************************/
 
 /********************************************************Implementation of UVCCameraLibrary class************************************************/
 
@@ -309,7 +10,9 @@ UVCXU::get_PropertyRange(
 UVCCameraLibrary::UVCCameraLibrary()
 {
 	// initialize COM
-	CoInitialize(0);
+	uvcxu = new UVCXU();
+	if (!SUCCEEDED(CoInitialize(0)))
+		printf("Coinitialization failed!");
 }
 
 /*
@@ -318,10 +21,11 @@ UVCCameraLibrary::UVCCameraLibrary()
 UVCCameraLibrary::~UVCCameraLibrary()
 {
 	// release directshow class instances
-	if(pEnumMoniker != NULL)
+	if (pEnumMoniker != NULL)
 		pEnumMoniker->Release();
-	if(pCreateDevEnum != NULL)
+	if (pCreateDevEnum != NULL)
 		pCreateDevEnum->Release();
+	delete uvcxu;
 	disconnectDevice();
 	// finalize COM
 	CoUninitialize();
@@ -333,22 +37,31 @@ UVCCameraLibrary::~UVCCameraLibrary()
 * @cameraNames : (out) name list of connected cameras
 * @nDevices : (out) the number of connected cameras
 */
-void UVCCameraLibrary::listDevices(char **cameraNames , int &nDevices)
+void UVCCameraLibrary::listDevices(char** cameraNames, int& nDevices)
 {
 	nDevices = 0;
-	IBaseFilter *pDeviceFilter = NULL;
+	IBaseFilter* pDeviceFilter = NULL;
 	// to select a video input device
-	ICreateDevEnum *pCreateDevEnum = NULL;
-	IEnumMoniker *pEnumMoniker = NULL;
-	IMoniker *pMoniker = NULL;
+	ICreateDevEnum* pCreateDevEnum = NULL;
+	IEnumMoniker* pEnumMoniker = NULL;
+	IMoniker* pMoniker = NULL;
 	ULONG nFetched = 0;
 	// initialize COM
-	CoInitialize(0);
+	if (!SUCCEEDED(CoInitialize(0)))
+	{
+		printf("Coinitialization failed - list device");
+		return;
+	}
 	// Create CreateDevEnum to list device
-	CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
-		IID_ICreateDevEnum, (PVOID *)&pCreateDevEnum);
+	if (!SUCCEEDED(CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
+		IID_ICreateDevEnum, (PVOID*)&pCreateDevEnum)))
+	{
+		printf("cocreateinstance failed - list device");
+		return;
+	}
 
 	// Create EnumMoniker to list VideoInputDevice 
+	// CLSID_VideoInputDeviceCategory: allows to enum only video input devices
 	pCreateDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
 		&pEnumMoniker, 0);
 	if (pEnumMoniker == NULL) {
@@ -359,58 +72,63 @@ void UVCCameraLibrary::listDevices(char **cameraNames , int &nDevices)
 
 	// reset EnumMoniker
 	pEnumMoniker->Reset();
-	
+
 	while (pEnumMoniker->Next(1, &pMoniker, &nFetched) == S_OK) {
 
 		//real name of the camera without suffix
-		char cameraRealNames[256][256];
-		
-		IPropertyBag *pPropertyBag;
+		char cameraRealNames[MAX_DEVICE_COUNT][MAX_USB_DESCRIPTOR_LENGTH];
+
+		IPropertyBag* pPropertyBag;
 		//unique name with suffix 
-		TCHAR devname[256];
+		TCHAR devname[MAX_USB_DESCRIPTOR_LENGTH];
 
 		// bind to IPropertyBag
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
-			(void **)&pPropertyBag);
+			(void**)&pPropertyBag);
 
 		VARIANT var;
-
 		// get FriendlyName
 		var.vt = VT_BSTR;
-		pPropertyBag->Read(L"FriendlyName", &var, 0);//device name
-		/*
-		* "FriendlyName"  The name of the device.VT_BSTR
-		* "Description"   A description of the device.VT_BSTR
-		* "DevicePath"    A unique string that identifies the device. (Video capture devices only.)   VT_BSTR
-		* "WaveInID"  The identifier for an audio capture device. (Audio capture devices only.)   VT_I4
-		*/
-		WideCharToMultiByte(CP_ACP, 0,
-			var.bstrVal, -1, devname, sizeof(devname), 0, 0);
-		VariantClear(&var);
-
-		int nSameNamedDevices = 0;
-		for (int j = 0; j < nDevices; j++)
+		if (SUCCEEDED(pPropertyBag->Read(L"FriendlyName", &var, 0)))//device name
 		{
-			if (strcmp(cameraRealNames[j], devname) == 0)
-				nSameNamedDevices++;
+			/*
+			* "FriendlyName"  The name of the device.VT_BSTR
+			* "Description"   A description of the device.VT_BSTR
+			* "DevicePath"    A unique string that identifies the device. (Video capture devices only.)   VT_BSTR
+			* "WaveInID"  The identifier for an audio capture device. (Audio capture devices only.)   VT_I4
+			*/
+			WideCharToMultiByte(CP_ACP, 0,
+				var.bstrVal, -1, devname, sizeof(devname), 0, 0);
+			VariantClear(&var);
+
+			int nSameNamedDevices = 0;
+			for (int j = 0; j < nDevices; j++)
+			{
+				if (strcmp(cameraRealNames[j], devname) == 0)
+					nSameNamedDevices++;
+			}
+			strcpy_s(cameraRealNames[nDevices], devname);
+			//if there are the same type of cameras 
+			//need to add some suffixes to identify the camera
+			//first camera has no prefix
+			//suffix [name] #[index] (e.g. PTZOptics Camera #1)
+			if (nSameNamedDevices > 0)
+				sprintf_s(devname, "%s #%d", devname, nSameNamedDevices);
+			strcpy_s(cameraNames[nDevices], sizeof(devname), (TCHAR*)devname);
+
+			// release
+			pMoniker->Release();
+			pPropertyBag->Release();
+
+			nDevices++;
 		}
-		strcpy_s(cameraRealNames[nDevices], devname);
-		//if there are the same type of cameras 
-		//need to add some suffixes to identify the camera
-		//first camera has no prefix
-		//suffix [name] #[index] (e.g. PTZOptics Camera #1)
-		if(nSameNamedDevices > 0)
-			sprintf_s(devname, "%s #%d", devname, nSameNamedDevices);
-		strcpy_s(cameraNames[nDevices] , sizeof(devname) , (TCHAR*)devname);
-
-		// release
-		pMoniker->Release();
-		pPropertyBag->Release();
-
-		nDevices++;
-	}	
+		else
+		{
+			printf("Unable to get the device name");
+		}
+		
+	}
 	// release
-
 	pEnumMoniker->Release();
 	pCreateDevEnum->Release();
 
@@ -425,8 +143,12 @@ void UVCCameraLibrary::listDevices(char **cameraNames , int &nDevices)
 void UVCCameraLibrary::getEnumMoniker()
 {
 	// Create CreateDevEnum to list device
-	CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
-		IID_ICreateDevEnum, (PVOID *)&pCreateDevEnum);
+	if (!SUCCEEDED(CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
+		IID_ICreateDevEnum, (PVOID*)&pCreateDevEnum)))
+	{
+		printf("cocreateinstance failed - get enum moniker");
+		return;
+	}
 
 	// Create EnumMoniker to list VideoInputDevice 
 	pCreateDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory,
@@ -446,7 +168,7 @@ void UVCCameraLibrary::getEnumMoniker()
 * @deviceName : (in) camera name defined in function listDevices
 * @return : true when connected successfully false if failes
 */
-bool UVCCameraLibrary::connectDevice(char *deviceName)
+bool UVCCameraLibrary::connectDevice(char* deviceName)
 {
 	getEnumMoniker();
 
@@ -455,72 +177,81 @@ bool UVCCameraLibrary::connectDevice(char *deviceName)
 
 	int nDevices = 0;
 	while (pEnumMoniker->Next(1, &pMoniker, &nFetched) == S_OK) {
-		
-		//we need real name without suffix to connect to camera
-		char cameraRealNames[256][256];
 
-		IPropertyBag *pPropertyBag;
-		TCHAR devname[256];
+		//we need real name without suffix to connect to camera
+		char cameraRealNames[MAX_DEVICE_COUNT][MAX_USB_DESCRIPTOR_LENGTH];
+
+		IPropertyBag* pPropertyBag;
+		TCHAR devname[MAX_USB_DESCRIPTOR_LENGTH];
 
 		// bind to IPropertyBag
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag,
-			(void **)&pPropertyBag);
+			(void**)&pPropertyBag);
 
 		VARIANT var;
-
 		// get FriendlyName
 		var.vt = VT_BSTR;
-		pPropertyBag->Read(L"FriendlyName", &var, 0);
-		WideCharToMultiByte(CP_ACP, 0,
-			var.bstrVal, -1, devname, sizeof(devname), 0, 0);
-		VariantClear(&var);
-
-		int nSameNamedDevices = 0;
-		for (int j = 0; j < nDevices; j++)
+		if (SUCCEEDED(pPropertyBag->Read(L"FriendlyName", &var, 0)))
 		{
-			if (strcmp(cameraRealNames[j], devname) == 0)
-				nSameNamedDevices++;
-		}
-		strcpy_s(cameraRealNames[nDevices], devname);
+			WideCharToMultiByte(CP_ACP, 0,
+				var.bstrVal, -1, devname, sizeof(devname), 0, 0);
+			VariantClear(&var);
 
-		if(nSameNamedDevices > 0)
-			sprintf_s(devname, "%s #%d", devname, nSameNamedDevices);
-
-		//printf("devname %s , devicename %s\n", devname, deviceName);
-
-		if (strcmp(devname, deviceName) == 0)
-		{
-			pMoniker->BindToObject(0, 0, IID_IBaseFilter,
-				(void**)&pDeviceFilter);
-			if (pDeviceFilter != NULL)
+			int nSameNamedDevices = 0;
+			for (int j = 0; j < nDevices; j++)
 			{
-				//this is the camera which we are going to connect
-				TCHAR devPath[256];
-				VARIANT var1;
-
-				// get FriendlyName
-				var1.vt = VT_BSTR;
-				pPropertyBag->Read(L"DevicePath", &var1, 0);
-				WideCharToMultiByte(CP_ACP, 0,
-					var1.bstrVal, -1, devPath, sizeof(devPath), 0, 0);
-				printf("device path %s", devPath);
-				VariantClear(&var1);
-
-				//get product id
-				//TODO
-
-				//get control ranges
-				getControlRanges();
-
-				return true;
+				if (strcmp(cameraRealNames[j], devname) == 0)
+					nSameNamedDevices++;
 			}
+			strcpy_s(cameraRealNames[nDevices], devname);
+
+			if (nSameNamedDevices > 0)
+				sprintf_s(devname, "%s #%d", devname, nSameNamedDevices);
+
+			//printf("devname %s , devicename %s\n", devname, deviceName);
+
+			if (strcmp(devname, deviceName) == 0)
+			{
+				pMoniker->BindToObject(0, 0, IID_IBaseFilter,
+					(void**)&pDeviceFilter);
+				if (pDeviceFilter != NULL)
+				{
+					//this is the camera which we are going to connect
+					TCHAR devPath[MAX_USB_DESCRIPTOR_LENGTH];
+					VARIANT var1;
+
+					// get Device Path
+					var1.vt = VT_BSTR;
+					//virtual cameras do not have devicepath information and it occurs error when read devicepath
+					//need to check the return value of read function
+					if (SUCCEEDED(pPropertyBag->Read(L"DevicePath", &var1, 0)))
+					{
+						WideCharToMultiByte(CP_ACP, 0,
+							var1.bstrVal, -1, devPath, sizeof(devPath), 0, 0);
+						printf("device path %s", devPath);
+						VariantClear(&var1);
+
+						//get product id
+						getCameraInfo(devPath);
+					}
+
+					//get control ranges
+					getControlRanges();
+
+					return true;
+				}
+			}
+
+			// release
+			pMoniker->Release();
+			pPropertyBag->Release();
+
+			nDevices++;
 		}
-
-		// release
-		pMoniker->Release();
-		pPropertyBag->Release();
-
-		nDevices++;
+		else
+		{
+			printf("Unable to get the device name");
+		}
 	}
 	return false;
 }
@@ -529,9 +260,11 @@ bool UVCCameraLibrary::connectDevice(char *deviceName)
 
 void UVCCameraLibrary::disconnectDevice()
 {
+	vendorId = 0;
+	productId = 0;
 	//release directshow filter
-	if(pDeviceFilter != NULL)
-	    pDeviceFilter->Release();
+	if (pDeviceFilter != NULL)
+		pDeviceFilter->Release();
 	pDeviceFilter = NULL;
 }
 
@@ -542,7 +275,7 @@ void UVCCameraLibrary::disconnectDevice()
 */
 HRESULT UVCCameraLibrary::movePanOneLeft(int pan)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE , - pan);
+	return moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, -pan);
 
 	//for check if the camera supports absolute movement
 	//PTZ Pro 2 does not support absolute movement
@@ -568,7 +301,7 @@ HRESULT UVCCameraLibrary::movePanOneRight(int pan)
 */
 HRESULT UVCCameraLibrary::moveTiltOneTop(int tilt)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE , tilt);
+	return moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tilt);
 }
 /*
 * move tilt to bottom one step
@@ -608,6 +341,16 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 {
 	//continuous zooming in
 	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE , zoom);
+	long zoomVal = getZoom();
+	long panVal = getPan();
+	long tiltVal = getTilt();
+	long focusVal = getFocus();
+	printf("zoom val now %d", zoomVal);
+	printf("pan val now %d", panVal);
+	printf("tilt val now %d", tiltVal);
+	printf("focus val now %d", focusVal);
+
+	return moveCamera(CameraControl_Zoom, zoomVal + zoom);
 	//absolute zooming in once
 	/*
 	* the following code does not support continuous zooming
@@ -620,6 +363,7 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 	//long focusVal = getFocus();
 	//return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
 
+/*
 	long panVal = getPan();
 	//printf("pan value before zooming %d\n", panVal);
 	long tiltVal = getTilt();
@@ -629,6 +373,7 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 	long zoomVal = getZoom();
 	//printf("zoom value before zooming %d\n", zoomVal);
 	return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
+*/
 }
 /*
 * zoom out one step
@@ -639,6 +384,8 @@ HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 {
 	//continous zooming out
 	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, -zoom);
+	long zoomVal = getZoom();
+	return moveCamera(CameraControl_Zoom, zoomVal - zoom);
 	//absolute zooming out once
 	/*
 	* the following code does not support continuous zooming
@@ -651,12 +398,14 @@ HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 	//long focusVal = getFocus();
 	//return moveTo(panVal, tiltVal, zoomVal - zoom, focusVal);
 
+/*
 	long panVal = getPan();
 	long tiltVal = getTilt();
 	long focusVal = getFocus();
 	long zoomVal = getZoom();
 	//printf("zoom value before zooming %d", zoomVal);
 	return moveTo(panVal, tiltVal, zoomVal - zoom, focusVal);
+*/
 }
 /*
 * focus in one step
@@ -704,7 +453,7 @@ HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -721,8 +470,8 @@ HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 		if (SUCCEEDED(hr))
 		{
 			hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
-			if(af)
-				hr = pCameraControl->Set(CameraControl_Focus, Val , CameraControl_Flags_Auto);
+			if (af)
+				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Auto);
 			else
 				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Manual);
 			if (FAILED(hr))
@@ -734,8 +483,8 @@ HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 		}
 
 	}
-	if(pCameraControl != NULL)
-	    pCameraControl->Release();
+	if (pCameraControl != NULL)
+		pCameraControl->Release();
 	return hr;
 }
 
@@ -751,7 +500,7 @@ HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -761,11 +510,11 @@ HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags, Val;
+		long Min, Max, Step, Default, Flags;
 
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		//printf("Min %d , Max %d , Step %d", Min, Max , Step);
+		printf("Min %d , Max %d , Step %d", Min, Max, Step);
 		if (SUCCEEDED(hr))
 		{
 			hr = pCameraControl->Set(prop, step, CameraControl_Flags_Manual);
@@ -786,7 +535,7 @@ HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 					printf("This device does not support focus continuous control\n");
 					break;
 				default:
-					printf("This device does not support continuous control KSPROPERTY: %d\n", prop);
+					printf("This device does not support this specific control: %d\n", prop);
 					break;
 				}
 			}
@@ -820,7 +569,7 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 	//hr = stopMoving();
 	//hr = stopZooming();
 	//hr = stopFocusing();
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -861,7 +610,7 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 
 		//use CameraControl_Pan, Tilt, Zoom for absolute movement
 		hr = pCameraControl->Set(CameraControl_Pan, pan, CameraControl_Flags_Manual);
-		if(FAILED(hr))
+		if (FAILED(hr))
 			printf("This device does not support pan absolute control\n");
 
 		hr = pCameraControl->Set(CameraControl_Tilt, tilt, CameraControl_Flags_Manual);
@@ -878,7 +627,7 @@ HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
 			if (FAILED(hr))
 				printf("This device does not support focus absolute control\n");
 		}
-		
+
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
@@ -894,7 +643,7 @@ HRESULT UVCCameraLibrary::moveHome()
 	//hr = stopMoving();
 	//hr = stopZooming();
 	//hr = stopFocusing();
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -962,8 +711,8 @@ bool UVCCameraLibrary::getAuto(long prop)
 	HRESULT hr = E_FAIL;
 
 	if (pDeviceFilter == NULL)
-		return E_FAIL;
-	IAMCameraControl *pCameraControl = 0;
+		return false;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -995,7 +744,7 @@ bool UVCCameraLibrary::getAuto(long prop)
 			return false;
 		}
 	}
-	
+
 }
 long UVCCameraLibrary::getVal(long prop)
 {
@@ -1003,7 +752,7 @@ long UVCCameraLibrary::getVal(long prop)
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -1080,7 +829,7 @@ HRESULT UVCCameraLibrary::stopControling(long prop)
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
 
-	IAMCameraControl *pCameraControl = 0;
+	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
@@ -1090,7 +839,7 @@ HRESULT UVCCameraLibrary::stopControling(long prop)
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags, Val;
+		long Min, Max, Step, Default, Flags;
 
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
@@ -1126,7 +875,7 @@ HRESULT UVCCameraLibrary::stopAbsControling(long prop)
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags, Val;
+		long Min, Max, Step, Default, Flags;
 
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
@@ -1149,37 +898,37 @@ HRESULT UVCCameraLibrary::stopAbsControling(long prop)
 HRESULT UVCCameraLibrary::osdMenuOpenClose()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuEnter()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_OK, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_OK, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuBack()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_BACK, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_BACK, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuUp()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_UP, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_UP, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuDown()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_DOWN, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_DOWN, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuLeft()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_LEFT, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_LEFT, ulUvcRedSize, (BYTE*)&nPos);
 }
 HRESULT UVCCameraLibrary::osdMenuRight()
 {
 	int nPos = 0;
-	return uvcxu.put_Property(UVC_1702C_XU_PLUG_CTRL_RIGHT, ulUvcRedSize, (BYTE*)&nPos);
+	return uvcxu->put_Property(UVC_1702C_XU_PLUG_CTRL_RIGHT, ulUvcRedSize, (BYTE*)&nPos);
 }
 
 HRESULT UVCCameraLibrary::checkOSDMenu()
@@ -1189,7 +938,7 @@ HRESULT UVCCameraLibrary::checkOSDMenu()
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
 
-	hr = uvcxu.QueryUvcXuInterface(pDeviceFilter, PROPSETID_XU_PLUG_IN_1700U, 0);
+	hr = uvcxu->QueryUvcXuInterface(pDeviceFilter, PROPSETID_XU_PLUG_IN_1700U, 0);
 	if (FAILED(hr))
 	{
 		return E_FAIL;
@@ -1197,18 +946,18 @@ HRESULT UVCCameraLibrary::checkOSDMenu()
 
 	hr = E_FAIL;
 
-	if (uvcxu.get_PropertySize(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, &ulUvcRedSize) == S_OK)
+	if (uvcxu->get_PropertySize(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, &ulUvcRedSize) == S_OK)
 	{
 		BYTE* pbPropertyValue;
 		pbPropertyValue = new BYTE[ulUvcRedSize];
 		if (pbPropertyValue)
 		{
-			if (uvcxu.get_Property(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, ulUvcRedSize, (BYTE*)pbPropertyValue) == S_OK)
+			if (uvcxu->get_Property(UVC_1702C_XU_PLUG_CTRL_OPEN_CLOSE, ulUvcRedSize, (BYTE*)pbPropertyValue) == S_OK)
 			{
 				hr = S_OK;
 			}
 		}
-		delete pbPropertyValue;
+		delete []pbPropertyValue;
 	}
 
 	return hr;
@@ -1229,7 +978,7 @@ HRESULT UVCCameraLibrary::getControlRanges()
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags, Val;
+		long Min, Max, Step, Default, Flags;
 
 		// Get the range and default values 
 		hr = pCameraControl->GetRange(CameraControl_Pan, &Min, &Max, &Step, &Default, &Flags);
@@ -1261,5 +1010,27 @@ HRESULT UVCCameraLibrary::getControlRanges()
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
 	return hr;
+}
+// Constructs a product ID from the Windows DevicePath. on a USB device the
+// devicePath contains product id and vendor id. This seems to work for firewire
+// as well.
+// Example of device path:
+// "\\?\usb#vid_0408&pid_2010&mi_00#7&258e7aaf&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global"
+void UVCCameraLibrary::getCameraInfo(TCHAR* devicePath)
+{
+	ULONG   ven, dev;
+	ven = dev = 0;
+
+	if (sscanf_s(devicePath,
+		"\\\\?\\usb#vid_%x&pid_%x",
+		&ven, &dev) != 2)
+	{
+		printf("Failed to get camera information");
+	}
+
+	vendorId = ven;
+	productId = dev;
+	
+	printf("vid_%x pid_%x", ven, dev);
 }
 /********************************************************End of UVCCameraLibrary class************************************************************/
