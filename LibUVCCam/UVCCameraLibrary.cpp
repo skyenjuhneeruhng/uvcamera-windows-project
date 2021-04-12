@@ -269,24 +269,36 @@ void UVCCameraLibrary::disconnectDevice()
 		pDeviceFilter->Release();
 	pDeviceFilter = NULL;
 }
+
+int UVCCameraLibrary::preProcessConVal(int propVal, uvc_ranges_t defaultRange)
+{
+	if (abs(propVal) > defaultRange.Max)
+		propVal = defaultRange.Max * ((propVal > 0) ? 1 : -1);
+	else if (abs(propVal) < defaultRange.Min)
+		propVal = defaultRange.Min * ((propVal > 0) ? 1 : -1);
+	return propVal;
+}
+int UVCCameraLibrary::preProcessAbsVal(int propVal, uvc_ranges_t defaultRange)
+{
+	if (propVal > defaultRange.Max)
+		propVal = defaultRange.Max;
+	else if (propVal < defaultRange.Min)
+		propVal = defaultRange.Min;
+	return propVal;
+}
+
 HRESULT UVCCameraLibrary::moveCameraPan(int pan)
 {
 	HRESULT hr = E_FAIL;
 	if (panConEnabled)
 	{
-		if (abs(pan) > panConRange.Max)
-			pan = panConRange.Max * ((pan > 0) ? 1 : -1);
-		else if (abs(pan) < panConRange.Min)
-			pan = panConRange.Min * ((pan > 0) ? 1 : -1);
-		hr = moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, pan);
+		int panVal = preProcessConVal(pan, panConRange);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, panVal);
 	}
 	else if (panAbsEnabled)
 	{
 		long panVal = getPan() + pan;
-		if (panVal > panAbsRange.Max)
-			panVal = panAbsRange.Max;
-		else if (panVal < panAbsRange.Min)
-			panVal = panAbsRange.Min;
+		panVal = preProcessAbsVal(panVal, panAbsRange);
 		hr = moveCamera(KSPROPERTY_CAMERACONTROL_PAN, panVal);
 	}
 	return hr;
@@ -297,19 +309,13 @@ HRESULT UVCCameraLibrary::moveCameraTilt(int tilt)
 	HRESULT hr = E_FAIL;
 	if (tiltConEnabled)
 	{
-		if (abs(tilt) > tiltConRange.Max)
-			tilt = tiltConRange.Max * ((tilt > 0) ? 1 : -1);
-		else if (abs(tilt) < tiltConRange.Min)
-			tilt = tiltConRange.Min * ((tilt > 0) ? 1 : -1);
-		hr = moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tilt);
+		int tiltVal = preProcessConVal(tilt, tiltConRange);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tiltVal);
 	}
 	else if (tiltAbsEnabled)
 	{
 		long tiltVal = getTilt() + tilt;
-		if (tiltVal > tiltAbsRange.Max)
-			tiltVal = tiltAbsRange.Max;
-		else if (tiltVal < tiltAbsRange.Min)
-			tiltVal = tiltAbsRange.Min;
+		tiltVal = preProcessAbsVal(tiltVal, tiltAbsRange);
 		hr = moveCamera(KSPROPERTY_CAMERACONTROL_TILT, tiltVal);
 	}
 	return hr;
@@ -319,19 +325,13 @@ HRESULT UVCCameraLibrary::moveCameraZoom(int zoom)
 	HRESULT hr = E_FAIL;
 	if (zoomConEnabled)
 	{
-		if (abs(zoom) > zoomConRange.Max)
-			zoom = zoomConRange.Max * ((zoom > 0) ? 1 : -1);
-		else if (abs(zoom) < zoomConRange.Min)
-			zoom = zoomConRange.Min * ((zoom > 0) ? 1 : -1);
-		hr = moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, zoom);
+		int zoomVal = preProcessConVal(zoom, zoomConRange);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, zoomVal);
 	}
 	else if (zoomAbsEnabled)
 	{
 		long zoomVal = getZoom() + zoom;
-		if (zoomVal > zoomAbsRange.Max)
-			zoomVal = zoomAbsRange.Max;
-		else if (zoomVal < zoomAbsRange.Min)
-			zoomVal = zoomAbsRange.Min;
+		zoomVal = preProcessAbsVal(zoomVal, zoomAbsRange);
 		hr = moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM, zoomVal);
 	}
 	return hr;
@@ -341,19 +341,13 @@ HRESULT UVCCameraLibrary::moveCameraFocus(int focus)
 	HRESULT hr = E_FAIL;
 	if (focusConEnabled)
 	{
-		if (abs(focus) > focusConRange.Max)
-			focus = focusConRange.Max * ((focus > 0) ? 1 : -1);
-		else if (abs(focus) < focusConRange.Min)
-			focus = focusConRange.Min * ((focus > 0) ? 1 : -1);
-		hr = moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE, focus);
+		int focusVal = preProcessConVal(focus, focusConRange);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE, focusVal);
 	}
 	else if (focusAbsEnabled)
 	{
 		long focusVal = getFocus() + focus;
-		if (focusVal > focusAbsRange.Max)
-			focusVal = focusAbsRange.Max;
-		else if (focusVal < focusAbsRange.Min)
-			focusVal = focusAbsRange.Min;
+		focusVal = preProcessAbsVal(focusVal, focusAbsRange);
 		hr = moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS, focusVal);
 	}
 	return hr;
@@ -474,6 +468,14 @@ HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 HRESULT UVCCameraLibrary::moveHome()
 {
 	HRESULT hr = E_FAIL;
+	hr = moveAbsPTZ(panAbsRange.Default, tiltAbsRange.Default, zoomAbsRange.Default);
+	hr = setAutoFocus(true);
+	return hr;
+}
+
+HRESULT UVCCameraLibrary::moveAbsPTZ(int pan, int tilt, int zoom)
+{
+	HRESULT hr = E_FAIL;
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
@@ -487,25 +489,20 @@ HRESULT UVCCameraLibrary::moveHome()
 	}
 	else
 	{
-		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_PAN, panAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
-		if (FAILED(hr))
-			printf("This device does not support pan absolute control\n");
+		//zoom should be the first since the digital ptz does not work before zooming
+		if (zoomAbsEnabled)
+			hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_ZOOM, preProcessAbsVal(zoom, zoomAbsRange), KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);	
 
-		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_TILT, tiltAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
-		if (FAILED(hr))
-			printf("This device does not support tilt absolute control\n");
+		if (panAbsEnabled)
+			hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_PAN, preProcessAbsVal(pan, panAbsRange), KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 
-		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_ZOOM, zoomAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
-		if (FAILED(hr))
-			printf("This device does not support zoom absolute control\n");
-
-		setAuto(KSPROPERTY_CAMERACONTROL_FOCUS, true);
+		if(tiltAbsEnabled)
+			hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_TILT, preProcessAbsVal(tilt, tiltAbsRange), KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
 	return hr;
 }
-
 bool UVCCameraLibrary::getAutoFocus()
 {
 	return getAuto(KSPROPERTY_CAMERACONTROL_FOCUS);

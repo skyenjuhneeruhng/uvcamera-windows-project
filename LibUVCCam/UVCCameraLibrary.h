@@ -54,6 +54,8 @@ public:
 	HRESULT focusOneOut(int focus);
 	//home
 	HRESULT moveHome();
+	//abs movement
+	HRESULT moveAbsPTZ(int pan, int tilt, int zoom);
 
 	//set auto/manual of focus
 	HRESULT setAutoFocus(bool af);
@@ -100,6 +102,11 @@ private:
 	HRESULT moveCameraTilt(int tilt);
 	HRESULT moveCameraZoom(int zoom);
 	HRESULT moveCameraFocus(int focus);
+
+	//process the values before control
+	int preProcessConVal(int propVal, uvc_ranges_t defaultRange);
+	int preProcessAbsVal(int propVal, uvc_ranges_t defaultRange);
+
 	//stop change of the property
 	HRESULT stopControling(long prop);
 

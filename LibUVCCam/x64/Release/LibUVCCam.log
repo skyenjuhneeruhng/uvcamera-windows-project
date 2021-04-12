@@ -9,95 +9,101 @@ G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(32,
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(41,1): warning C4273: 'UVCCameraLibrary::listDevices': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(35,14): message : see previous definition of 'listDevices'
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(143,1): warning C4273: 'UVCCameraLibrary::getEnumMoniker': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(95,7): message : see previous definition of 'getEnumMoniker'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(97,7): message : see previous definition of 'getEnumMoniker'
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(171,1): warning C4273: 'UVCCameraLibrary::connectDevice': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(38,7): message : see previous definition of 'connectDevice'
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(258,1): warning C4273: 'UVCCameraLibrary::disconnectDevice': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(41,7): message : see previous definition of 'disconnectDevice'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(273,1): warning C4273: 'UVCCameraLibrary::moveCameraPan': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(99,10): message : see previous definition of 'moveCameraPan'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(296,1): warning C4273: 'UVCCameraLibrary::moveCameraTilt': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(100,10): message : see previous definition of 'moveCameraTilt'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(318,1): warning C4273: 'UVCCameraLibrary::moveCameraZoom': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(101,10): message : see previous definition of 'moveCameraZoom'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(274,1): warning C4273: 'UVCCameraLibrary::preProcessConVal': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(107,6): message : see previous definition of 'preProcessConVal'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(282,1): warning C4273: 'UVCCameraLibrary::preProcessAbsVal': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(108,6): message : see previous definition of 'preProcessAbsVal'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(291,1): warning C4273: 'UVCCameraLibrary::moveCameraPan': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(101,10): message : see previous definition of 'moveCameraPan'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(308,1): warning C4273: 'UVCCameraLibrary::moveCameraTilt': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(102,10): message : see previous definition of 'moveCameraTilt'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(324,1): warning C4273: 'UVCCameraLibrary::moveCameraZoom': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(103,10): message : see previous definition of 'moveCameraZoom'
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(340,1): warning C4273: 'UVCCameraLibrary::moveCameraFocus': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(102,10): message : see previous definition of 'moveCameraFocus'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(367,1): warning C4273: 'UVCCameraLibrary::movePanOneLeft': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(104,10): message : see previous definition of 'moveCameraFocus'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(361,1): warning C4273: 'UVCCameraLibrary::movePanOneLeft': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(45,10): message : see previous definition of 'movePanOneLeft'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(376,1): warning C4273: 'UVCCameraLibrary::movePanOneRight': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(370,1): warning C4273: 'UVCCameraLibrary::movePanOneRight': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(46,10): message : see previous definition of 'movePanOneRight'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(385,1): warning C4273: 'UVCCameraLibrary::moveTiltOneTop': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(379,1): warning C4273: 'UVCCameraLibrary::moveTiltOneTop': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(47,10): message : see previous definition of 'moveTiltOneTop'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(394,1): warning C4273: 'UVCCameraLibrary::moveTiltOneBottom': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(388,1): warning C4273: 'UVCCameraLibrary::moveTiltOneBottom': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(48,10): message : see previous definition of 'moveTiltOneBottom'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(404,1): warning C4273: 'UVCCameraLibrary::zoomOneIn': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(398,1): warning C4273: 'UVCCameraLibrary::zoomOneIn': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(50,10): message : see previous definition of 'zoomOneIn'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(413,1): warning C4273: 'UVCCameraLibrary::zoomOneOut': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(407,1): warning C4273: 'UVCCameraLibrary::zoomOneOut': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(51,10): message : see previous definition of 'zoomOneOut'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(423,1): warning C4273: 'UVCCameraLibrary::focusOneIn': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(417,1): warning C4273: 'UVCCameraLibrary::focusOneIn': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(53,10): message : see previous definition of 'focusOneIn'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(433,1): warning C4273: 'UVCCameraLibrary::focusOneOut': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(427,1): warning C4273: 'UVCCameraLibrary::focusOneOut': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(54,10): message : see previous definition of 'focusOneOut'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(442,1): warning C4273: 'UVCCameraLibrary::setAutoFocus': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(59,10): message : see previous definition of 'setAutoFocus'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(453,1): warning C4273: 'UVCCameraLibrary::moveCamera': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(98,10): message : see previous definition of 'moveCamera'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(475,1): warning C4273: 'UVCCameraLibrary::moveHome': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(436,1): warning C4273: 'UVCCameraLibrary::setAutoFocus': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(61,10): message : see previous definition of 'setAutoFocus'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(447,1): warning C4273: 'UVCCameraLibrary::moveCamera': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(100,10): message : see previous definition of 'moveCamera'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(469,1): warning C4273: 'UVCCameraLibrary::moveHome': inconsistent dll linkage
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(56,10): message : see previous definition of 'moveHome'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(510,1): warning C4273: 'UVCCameraLibrary::getAutoFocus': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(66,7): message : see previous definition of 'getAutoFocus'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(514,1): warning C4273: 'UVCCameraLibrary::getPan': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(69,7): message : see previous definition of 'getPan'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(518,1): warning C4273: 'UVCCameraLibrary::getTilt': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(70,7): message : see previous definition of 'getTilt'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(522,1): warning C4273: 'UVCCameraLibrary::getZoom': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(71,7): message : see previous definition of 'getZoom'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(526,1): warning C4273: 'UVCCameraLibrary::getFocus': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(72,7): message : see previous definition of 'getFocus'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(531,1): warning C4273: 'UVCCameraLibrary::setAuto': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(108,10): message : see previous definition of 'setAuto'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(561,1): warning C4273: 'UVCCameraLibrary::getAuto': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(107,7): message : see previous definition of 'getAuto'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(593,1): warning C4273: 'UVCCameraLibrary::getVal': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(111,7): message : see previous definition of 'getVal'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(625,1): warning C4273: 'UVCCameraLibrary::stopMoving': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(61,10): message : see previous definition of 'stopMoving'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(630,1): warning C4273: 'UVCCameraLibrary::stopZooming': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(62,10): message : see previous definition of 'stopZooming'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(634,1): warning C4273: 'UVCCameraLibrary::stopFocusing': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(63,10): message : see previous definition of 'stopFocusing'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(639,1): warning C4273: 'UVCCameraLibrary::stopControling': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(104,10): message : see previous definition of 'stopControling'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(667,1): warning C4273: 'UVCCameraLibrary::osdMenuOpenClose': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(75,10): message : see previous definition of 'osdMenuOpenClose'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(672,1): warning C4273: 'UVCCameraLibrary::osdMenuEnter': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(76,10): message : see previous definition of 'osdMenuEnter'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(677,1): warning C4273: 'UVCCameraLibrary::osdMenuBack': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(77,10): message : see previous definition of 'osdMenuBack'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(682,1): warning C4273: 'UVCCameraLibrary::osdMenuUp': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(78,10): message : see previous definition of 'osdMenuUp'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(687,1): warning C4273: 'UVCCameraLibrary::osdMenuDown': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(79,10): message : see previous definition of 'osdMenuDown'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(692,1): warning C4273: 'UVCCameraLibrary::osdMenuLeft': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(80,10): message : see previous definition of 'osdMenuLeft'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(697,1): warning C4273: 'UVCCameraLibrary::osdMenuRight': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(81,10): message : see previous definition of 'osdMenuRight'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(703,1): warning C4273: 'UVCCameraLibrary::checkOSDMenu': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(84,10): message : see previous definition of 'checkOSDMenu'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(735,1): warning C4273: 'UVCCameraLibrary::getPropRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(144,7): message : see previous definition of 'getPropRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(756,1): warning C4273: 'UVCCameraLibrary::getPanRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(145,7): message : see previous definition of 'getPanRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(765,1): warning C4273: 'UVCCameraLibrary::getTiltRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(146,7): message : see previous definition of 'getTiltRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(774,1): warning C4273: 'UVCCameraLibrary::getZoomRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(147,7): message : see previous definition of 'getZoomRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(783,1): warning C4273: 'UVCCameraLibrary::getFocusRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(148,7): message : see previous definition of 'getFocusRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(793,1): warning C4273: 'UVCCameraLibrary::getControlRanges': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(149,10): message : see previous definition of 'getControlRanges'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(823,1): warning C4273: 'UVCCameraLibrary::getCameraInfo': inconsistent dll linkage
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(153,7): message : see previous definition of 'getCameraInfo'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(477,1): warning C4273: 'UVCCameraLibrary::moveAbsPTZ': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(58,10): message : see previous definition of 'moveAbsPTZ'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(507,1): warning C4273: 'UVCCameraLibrary::getAutoFocus': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(68,7): message : see previous definition of 'getAutoFocus'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(511,1): warning C4273: 'UVCCameraLibrary::getPan': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(71,7): message : see previous definition of 'getPan'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(515,1): warning C4273: 'UVCCameraLibrary::getTilt': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(72,7): message : see previous definition of 'getTilt'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(519,1): warning C4273: 'UVCCameraLibrary::getZoom': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(73,7): message : see previous definition of 'getZoom'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(523,1): warning C4273: 'UVCCameraLibrary::getFocus': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(74,7): message : see previous definition of 'getFocus'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(528,1): warning C4273: 'UVCCameraLibrary::setAuto': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(115,10): message : see previous definition of 'setAuto'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(558,1): warning C4273: 'UVCCameraLibrary::getAuto': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(114,7): message : see previous definition of 'getAuto'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(590,1): warning C4273: 'UVCCameraLibrary::getVal': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(118,7): message : see previous definition of 'getVal'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(622,1): warning C4273: 'UVCCameraLibrary::stopMoving': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(63,10): message : see previous definition of 'stopMoving'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(627,1): warning C4273: 'UVCCameraLibrary::stopZooming': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(64,10): message : see previous definition of 'stopZooming'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(631,1): warning C4273: 'UVCCameraLibrary::stopFocusing': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(65,10): message : see previous definition of 'stopFocusing'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(636,1): warning C4273: 'UVCCameraLibrary::stopControling': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(111,10): message : see previous definition of 'stopControling'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(664,1): warning C4273: 'UVCCameraLibrary::osdMenuOpenClose': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(77,10): message : see previous definition of 'osdMenuOpenClose'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(669,1): warning C4273: 'UVCCameraLibrary::osdMenuEnter': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(78,10): message : see previous definition of 'osdMenuEnter'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(674,1): warning C4273: 'UVCCameraLibrary::osdMenuBack': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(79,10): message : see previous definition of 'osdMenuBack'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(679,1): warning C4273: 'UVCCameraLibrary::osdMenuUp': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(80,10): message : see previous definition of 'osdMenuUp'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(684,1): warning C4273: 'UVCCameraLibrary::osdMenuDown': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(81,10): message : see previous definition of 'osdMenuDown'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(689,1): warning C4273: 'UVCCameraLibrary::osdMenuLeft': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(82,10): message : see previous definition of 'osdMenuLeft'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(694,1): warning C4273: 'UVCCameraLibrary::osdMenuRight': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(83,10): message : see previous definition of 'osdMenuRight'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(700,1): warning C4273: 'UVCCameraLibrary::checkOSDMenu': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(86,10): message : see previous definition of 'checkOSDMenu'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(732,1): warning C4273: 'UVCCameraLibrary::getPropRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(151,7): message : see previous definition of 'getPropRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(753,1): warning C4273: 'UVCCameraLibrary::getPanRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(152,7): message : see previous definition of 'getPanRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(762,1): warning C4273: 'UVCCameraLibrary::getTiltRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(153,7): message : see previous definition of 'getTiltRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(771,1): warning C4273: 'UVCCameraLibrary::getZoomRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(154,7): message : see previous definition of 'getZoomRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(780,1): warning C4273: 'UVCCameraLibrary::getFocusRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(155,7): message : see previous definition of 'getFocusRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(790,1): warning C4273: 'UVCCameraLibrary::getControlRanges': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(156,10): message : see previous definition of 'getControlRanges'
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(820,1): warning C4273: 'UVCCameraLibrary::getCameraInfo': inconsistent dll linkage
+G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.h(160,7): message : see previous definition of 'getCameraInfo'
   UVCUX.cpp
   Compiling...
 G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCUX.cpp(77): warning C6001: Using uninitialized memory 'ulBytesReturned'.: Lines: 25, 26, 27, 28, 30, 34, 35, 39, 40, 46, 47, 48, 51, 53, 55, 60, 61, 62, 63, 65, 66, 67, 68, 69, 70, 72, 77
@@ -112,6 +118,6 @@ G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibUVCCam\UVCCameraLibrary.cpp(2
      Creating library G:\CWorks\UVCCameraDLL\uvcamera-windows-project\x64\Release\LibUVCCam.lib and object G:\CWorks\UVCCameraDLL\uvcamera-windows-project\x64\Release\LibUVCCam.exp
   Generating code
   Previous IPDB not found, fall back to full compilation.
-  All 70 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 73 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   LibUVCCam.vcxproj -> G:\CWorks\UVCCameraDLL\uvcamera-windows-project\x64\Release\LibUVCCam.dll
