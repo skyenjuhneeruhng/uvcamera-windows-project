@@ -22,7 +22,7 @@ typedef struct {
 const uvc_ranges_t DEFAULT_RANGES = {
 		0,
 		0,
-		1
+		0
 };
 
 class UVCCAMERAAPI UVCCameraLibrary
@@ -46,10 +46,6 @@ public:
 	HRESULT movePanOneRight(int pan);
 	HRESULT moveTiltOneTop(int tilt);
 	HRESULT moveTiltOneBottom(int tilt);
-	/*HRESULT angleUpLeft(int pan, int tilt);
-	HRESULT angleUpRight(int pan, int tilt);
-	HRESULT angleDownLeft(int pan, int tilt);
-	HRESULT anglueDownRight(int pan, int tilt);*/
 	//zoom
 	HRESULT zoomOneIn(int zoom);
 	HRESULT zoomOneOut(int zoom);
@@ -58,8 +54,7 @@ public:
 	HRESULT focusOneOut(int focus);
 	//home
 	HRESULT moveHome();
-	//move to absolute position
-	HRESULT moveTo(int pan, int tilt, int zoom, int focus);
+
 	//set auto/manual of focus
 	HRESULT setAutoFocus(bool af);
 	//stop moving, zooming, focusing
@@ -101,24 +96,58 @@ private:
 
 	//change the property of camera according to @prop
 	HRESULT moveCamera(long prop, int step);
+	HRESULT moveCameraPan(int pan);
+	HRESULT moveCameraTilt(int tilt);
+	HRESULT moveCameraZoom(int zoom);
+	HRESULT moveCameraFocus(int focus);
 	//stop change of the property
 	HRESULT stopControling(long prop);
-	HRESULT stopAbsControling(long ctrlProp);
 
 	//get Auto/Manual status of property
 	bool getAuto(long prop);
+	HRESULT setAuto(long prop, bool autoEnabled);
 
 	//get value of the property
 	long getVal(long prop);
 
 	//the range of the pan, tilt, zoom
-	uvc_ranges_t panRange = DEFAULT_RANGES;
-	uvc_ranges_t tiltRange = DEFAULT_RANGES;
-	uvc_ranges_t zoomRange = DEFAULT_RANGES;
-	uvc_ranges_t focusRange = DEFAULT_RANGES;
+	uvc_ranges_t panConRange = DEFAULT_RANGES;
+	uvc_ranges_t panAbsRange = DEFAULT_RANGES;
+
+	uvc_ranges_t tiltConRange = DEFAULT_RANGES;
+	uvc_ranges_t tiltAbsRange = DEFAULT_RANGES;
+
+	uvc_ranges_t zoomConRange = DEFAULT_RANGES;
+	uvc_ranges_t zoomAbsRange = DEFAULT_RANGES;
+
+	uvc_ranges_t focusConRange = DEFAULT_RANGES;
+	uvc_ranges_t focusAbsRange = DEFAULT_RANGES;
+
+
+	//uvc controllability
+	bool uvcEnabled = true;
+
+	//continuous movement capability
+	bool panConEnabled = true;
+	bool panAbsEnabled = true;
+
+	bool tiltConEnabled = true;
+	bool tiltAbsEnabled = true;
+
+	bool zoomConEnabled = true;
+	bool zoomAbsEnabled = true;
+
+	bool focusConEnabled = true;
+	bool focusAbsEnabled = true;
 
 	//get ptz control ranges
+	bool getPropRanges(long prop, uvc_ranges_t& range, IAMCameraControl* pCamControl);//returns true if the device is continuous control available
+	void getPanRanges(IAMCameraControl* pCamControl);
+	void getTiltRanges(IAMCameraControl* pCamControl);
+	void getZoomRanges(IAMCameraControl* pCamControl);
+	void getFocusRanges(IAMCameraControl* pCamControl);
 	HRESULT getControlRanges();
+
 
 	//get pid and vid
 	void getCameraInfo(TCHAR* devPath);

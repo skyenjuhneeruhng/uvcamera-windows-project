@@ -12,7 +12,7 @@ UVCCameraLibrary::UVCCameraLibrary()
 	// initialize COM
 	uvcxu = new UVCXU();
 	if (!SUCCEEDED(CoInitialize(0)))
-		printf("Coinitialization failed!");
+		printf("Coinitialization failed!\n");
 }
 
 /*
@@ -49,14 +49,14 @@ void UVCCameraLibrary::listDevices(char** cameraNames, int& nDevices)
 	// initialize COM
 	if (!SUCCEEDED(CoInitialize(0)))
 	{
-		printf("Coinitialization failed - list device");
+		printf("Coinitialization failed - list device\n");
 		return;
 	}
 	// Create CreateDevEnum to list device
 	if (!SUCCEEDED(CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
 		IID_ICreateDevEnum, (PVOID*)&pCreateDevEnum)))
 	{
-		printf("cocreateinstance failed - list device");
+		printf("cocreateinstance failed - list device\n");
 		return;
 	}
 
@@ -100,7 +100,6 @@ void UVCCameraLibrary::listDevices(char** cameraNames, int& nDevices)
 			WideCharToMultiByte(CP_ACP, 0,
 				var.bstrVal, -1, devname, sizeof(devname), 0, 0);
 			VariantClear(&var);
-
 			int nSameNamedDevices = 0;
 			for (int j = 0; j < nDevices; j++)
 			{
@@ -124,7 +123,7 @@ void UVCCameraLibrary::listDevices(char** cameraNames, int& nDevices)
 		}
 		else
 		{
-			printf("Unable to get the device name");
+			printf("Unable to get the device name\n");
 		}
 		
 	}
@@ -146,7 +145,7 @@ void UVCCameraLibrary::getEnumMoniker()
 	if (!SUCCEEDED(CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC_SERVER,
 		IID_ICreateDevEnum, (PVOID*)&pCreateDevEnum)))
 	{
-		printf("cocreateinstance failed - get enum moniker");
+		printf("cocreateinstance failed - get enum moniker\n");
 		return;
 	}
 
@@ -196,7 +195,6 @@ bool UVCCameraLibrary::connectDevice(char* deviceName)
 			WideCharToMultiByte(CP_ACP, 0,
 				var.bstrVal, -1, devname, sizeof(devname), 0, 0);
 			VariantClear(&var);
-
 			int nSameNamedDevices = 0;
 			for (int j = 0; j < nDevices; j++)
 			{
@@ -228,9 +226,8 @@ bool UVCCameraLibrary::connectDevice(char* deviceName)
 					{
 						WideCharToMultiByte(CP_ACP, 0,
 							var1.bstrVal, -1, devPath, sizeof(devPath), 0, 0);
-						printf("device path %s", devPath);
 						VariantClear(&var1);
-
+						printf("device path %s\n", devPath);
 						//get product id
 						getCameraInfo(devPath);
 					}
@@ -250,24 +247,117 @@ bool UVCCameraLibrary::connectDevice(char* deviceName)
 		}
 		else
 		{
-			printf("Unable to get the device name");
+			printf("Unable to get the device name\n");
 		}
+
 	}
 	return false;
 }
-
-
 
 void UVCCameraLibrary::disconnectDevice()
 {
 	vendorId = 0;
 	productId = 0;
+	uvcEnabled = true;
+	panConEnabled = true;
+	tiltConEnabled = true;
+	zoomConEnabled = true;
+	focusConEnabled = true;
+
 	//release directshow filter
 	if (pDeviceFilter != NULL)
 		pDeviceFilter->Release();
 	pDeviceFilter = NULL;
 }
+HRESULT UVCCameraLibrary::moveCameraPan(int pan)
+{
+	HRESULT hr = E_FAIL;
+	if (panConEnabled)
+	{
+		if (abs(pan) > panConRange.Max)
+			pan = panConRange.Max * ((pan > 0) ? 1 : -1);
+		else if (abs(pan) < panConRange.Min)
+			pan = panConRange.Min * ((pan > 0) ? 1 : -1);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, pan);
+	}
+	else if (panAbsEnabled)
+	{
+		long panVal = getPan() + pan;
+		if (panVal > panAbsRange.Max)
+			panVal = panAbsRange.Max;
+		else if (panVal < panAbsRange.Min)
+			panVal = panAbsRange.Min;
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_PAN, panVal);
+	}
+	return hr;
+}
 
+HRESULT UVCCameraLibrary::moveCameraTilt(int tilt)
+{
+	HRESULT hr = E_FAIL;
+	if (tiltConEnabled)
+	{
+		if (abs(tilt) > tiltConRange.Max)
+			tilt = tiltConRange.Max * ((tilt > 0) ? 1 : -1);
+		else if (abs(tilt) < tiltConRange.Min)
+			tilt = tiltConRange.Min * ((tilt > 0) ? 1 : -1);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tilt);
+	}
+	else if (tiltAbsEnabled)
+	{
+		long tiltVal = getTilt() + tilt;
+		if (tiltVal > tiltAbsRange.Max)
+			tiltVal = tiltAbsRange.Max;
+		else if (tiltVal < tiltAbsRange.Min)
+			tiltVal = tiltAbsRange.Min;
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_TILT, tiltVal);
+	}
+	return hr;
+}
+HRESULT UVCCameraLibrary::moveCameraZoom(int zoom)
+{
+	HRESULT hr = E_FAIL;
+	if (zoomConEnabled)
+	{
+		if (abs(zoom) > zoomConRange.Max)
+			zoom = zoomConRange.Max * ((zoom > 0) ? 1 : -1);
+		else if (abs(zoom) < zoomConRange.Min)
+			zoom = zoomConRange.Min * ((zoom > 0) ? 1 : -1);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, zoom);
+	}
+	else if (zoomAbsEnabled)
+	{
+		long zoomVal = getZoom() + zoom;
+		if (zoomVal > zoomAbsRange.Max)
+			zoomVal = zoomAbsRange.Max;
+		else if (zoomVal < zoomAbsRange.Min)
+			zoomVal = zoomAbsRange.Min;
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM, zoomVal);
+	}
+	return hr;
+}
+HRESULT UVCCameraLibrary::moveCameraFocus(int focus)
+{
+	HRESULT hr = E_FAIL;
+	if (focusConEnabled)
+	{
+		if (abs(focus) > focusConRange.Max)
+			focus = focusConRange.Max * ((focus > 0) ? 1 : -1);
+		else if (abs(focus) < focusConRange.Min)
+			focus = focusConRange.Min * ((focus > 0) ? 1 : -1);
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE, focus);
+	}
+	else if (focusAbsEnabled)
+	{
+		long focusVal = getFocus() + focus;
+		if (focusVal > focusAbsRange.Max)
+			focusVal = focusAbsRange.Max;
+		else if (focusVal < focusAbsRange.Min)
+			focusVal = focusAbsRange.Min;
+		hr = moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS, focusVal);
+	}
+	return hr;
+}
 /*
 * move pan to left one step
 * @pan: (in) step of the panning
@@ -275,15 +365,7 @@ void UVCCameraLibrary::disconnectDevice()
 */
 HRESULT UVCCameraLibrary::movePanOneLeft(int pan)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, -pan);
-
-	//for check if the camera supports absolute movement
-	//PTZ Pro 2 does not support absolute movement
-	//long zoomVal = getZoom();
-	//long panVal = getPan();
-	//long tiltVal = getTilt();
-	//long focusVal = getFocus();
-	//return moveTo(panVal + pan, tiltVal, zoomVal, focusVal);
+	return moveCameraPan(-pan);
 }
 /*
 * move pan to right one step
@@ -292,7 +374,7 @@ HRESULT UVCCameraLibrary::movePanOneLeft(int pan)
 */
 HRESULT UVCCameraLibrary::movePanOneRight(int pan)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, pan);
+	return moveCameraPan(pan);
 }
 /*
 * move tilt to top one step
@@ -301,7 +383,7 @@ HRESULT UVCCameraLibrary::movePanOneRight(int pan)
 */
 HRESULT UVCCameraLibrary::moveTiltOneTop(int tilt)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tilt);
+	return moveCameraTilt(tilt);
 }
 /*
 * move tilt to bottom one step
@@ -310,28 +392,9 @@ HRESULT UVCCameraLibrary::moveTiltOneTop(int tilt)
 */
 HRESULT UVCCameraLibrary::moveTiltOneBottom(int tilt)
 {
-	return moveCamera(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, -tilt);
+	return moveCameraTilt(-tilt);
 }
-/*HRESULT angleUpLeft(int pan, int tilt)
-{
-	HRESULT hr;
-	return hr;
-}
-HRESULT angleUpRight(int pan, int tilt)
-{
-	HRESULT hr;
-	return hr;
-}
-HRESULT angleDownLeft(int pan, int tilt)
-{
-	HRESULT hr;
-	return hr;
-}
-HRESULT anglueDownRight(int pan, int tilt)
-{
-	HRESULT hr;
-	return hr;
-}*/
+
 /*
 * zoom in one step
 * @tilt: (in) step of the zooming
@@ -339,41 +402,7 @@ HRESULT anglueDownRight(int pan, int tilt)
 */
 HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 {
-	//continuous zooming in
-	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE , zoom);
-	long zoomVal = getZoom();
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long focusVal = getFocus();
-	printf("zoom val now %d", zoomVal);
-	printf("pan val now %d", panVal);
-	printf("tilt val now %d", tiltVal);
-	printf("focus val now %d", focusVal);
-
-	return moveCamera(CameraControl_Zoom, zoomVal + zoom);
-	//absolute zooming in once
-	/*
-	* the following code does not support continuous zooming
-	* then how can we solve that problem?
-	* what if we zoom to the end and then stop zooming when we release the button?
-	*/
-	//long zoomVal = getZoom();
-	//long panVal = getPan();
-	//long tiltVal = getTilt();
-	//long focusVal = getFocus();
-	//return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
-
-/*
-	long panVal = getPan();
-	//printf("pan value before zooming %d\n", panVal);
-	long tiltVal = getTilt();
-	//printf("tilt value before zooming %d\n", tiltVal);
-	long focusVal = getFocus();
-	//printf("focus value before zooming %d\n", focusVal);
-	long zoomVal = getZoom();
-	//printf("zoom value before zooming %d\n", zoomVal);
-	return moveTo(panVal, tiltVal, zoomVal + zoom, focusVal);
-*/
+	return moveCameraZoom(zoom);
 }
 /*
 * zoom out one step
@@ -382,30 +411,7 @@ HRESULT UVCCameraLibrary::zoomOneIn(int zoom)
 */
 HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 {
-	//continous zooming out
-	//return moveCamera(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, -zoom);
-	long zoomVal = getZoom();
-	return moveCamera(CameraControl_Zoom, zoomVal - zoom);
-	//absolute zooming out once
-	/*
-	* the following code does not support continuous zooming
-	* then how can we solve that problem?
-	* what if we zoom to the end and then stop zooming when we release the button?
-	*/
-	//long zoomVal = getZoom();
-	//long panVal = getPan();
-	//long tiltVal = getTilt();
-	//long focusVal = getFocus();
-	//return moveTo(panVal, tiltVal, zoomVal - zoom, focusVal);
-
-/*
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long focusVal = getFocus();
-	long zoomVal = getZoom();
-	//printf("zoom value before zooming %d", zoomVal);
-	return moveTo(panVal, tiltVal, zoomVal - zoom, focusVal);
-*/
+	return moveCameraZoom(-zoom);
 }
 /*
 * focus in one step
@@ -415,14 +421,7 @@ HRESULT UVCCameraLibrary::zoomOneOut(int zoom)
 */
 HRESULT UVCCameraLibrary::focusOneIn(int focus)
 {
-	//continuous focusing in
-	//return moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE , focus);
-	//absolute focus in to the end - the same result as continuous focusing
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long zoomVal = getZoom();
-	long focusVal = getFocus();
-	return moveTo(panVal, tiltVal, zoomVal, focusVal + focus);
+	return moveCameraFocus(focus);
 }
 /*
 * focus out one step
@@ -432,14 +431,7 @@ HRESULT UVCCameraLibrary::focusOneIn(int focus)
 */
 HRESULT UVCCameraLibrary::focusOneOut(int focus)
 {
-	//continuous focusing out
-	//return moveCamera(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE, -focus);
-	//absolute focus in to the end - the same result as continuous focusing
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long zoomVal = getZoom();
-	long focusVal = getFocus();
-	return moveTo(panVal, tiltVal, zoomVal, focusVal - focus);
+	return moveCameraFocus(-focus);
 }
 /*
 * set fucus mode
@@ -448,44 +440,7 @@ HRESULT UVCCameraLibrary::focusOneOut(int focus)
 */
 HRESULT UVCCameraLibrary::setAutoFocus(bool af)
 {
-	//stopFocusing();
-	HRESULT hr = E_FAIL;
-
-	if (pDeviceFilter == NULL)
-		return E_FAIL;
-	IAMCameraControl* pCameraControl = 0;
-	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
-	if (FAILED(hr))
-	{
-		// The device does not support IAMCameraControl
-		printf("This device does not support IAMCameraControl\n");
-
-	}
-	else
-	{
-		long Min, Max, Step, Default, Flags, Val;
-
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(CameraControl_Focus, &Min, &Max, &Step, &Default, &Flags);
-		if (SUCCEEDED(hr))
-		{
-			hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
-			if (af)
-				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Auto);
-			else
-				hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Manual);
-			if (FAILED(hr))
-				printf("This device does not support focus auto control\n");
-		}
-		else
-		{
-			printf("Can not get focus range of this device\n");
-		}
-
-	}
-	if (pCameraControl != NULL)
-		pCameraControl->Release();
-	return hr;
+	return setAuto(KSPROPERTY_CAMERACONTROL_FOCUS, af);
 }
 
 /*
@@ -506,128 +461,10 @@ HRESULT UVCCameraLibrary::moveCamera(long prop, int step)
 	{
 		// The device does not support IAMCameraControl
 		printf("This device does not support IAMCameraControl\n");
-
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags;
-
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		printf("Min %d , Max %d , Step %d", Min, Max, Step);
-		if (SUCCEEDED(hr))
-		{
-			hr = pCameraControl->Set(prop, step, CameraControl_Flags_Manual);
-			if (FAILED(hr))
-			{
-				switch (prop)
-				{
-				case KSPROPERTY_CAMERACONTROL_PAN_RELATIVE:
-					printf("This device does not support pan continuous control\n");
-					break;
-				case KSPROPERTY_CAMERACONTROL_TILT_RELATIVE:
-					printf("This device does not support tilt continuous control\n");
-					break;
-				case KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE:
-					printf("This device does not support zoom continuous control\n");
-					break;
-				case KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE:
-					printf("This device does not support focus continuous control\n");
-					break;
-				default:
-					printf("This device does not support this specific control: %d\n", prop);
-					break;
-				}
-			}
-		}
-		else
-		{
-			printf("Can not get range of this device\n");
-		}
-	}
-	if (pCameraControl != NULL)
-		pCameraControl->Release();
-	return hr;
-}
-/*
-* move to absolute position
-* @pan: pan
-* @tilt: tilt
-* @zoom: zoom
-* @focus: focus
-* @return: if success returns S_OK
-* must add min values from pan, tilt, zoom
-* the range of the pan, tilt, zoom values are like this -1 t0 1
-* but the available properties are like 0 to 255
-*/
-HRESULT UVCCameraLibrary::moveTo(int pan, int tilt, int zoom, int focus)
-{
-	HRESULT hr = E_FAIL;
-
-	if (pDeviceFilter == NULL)
-		return E_FAIL;
-	//hr = stopMoving();
-	//hr = stopZooming();
-	//hr = stopFocusing();
-	IAMCameraControl* pCameraControl = 0;
-	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
-	if (FAILED(hr))
-	{
-		// The device does not support IAMCameraControl
-		printf("This device does not support IAMCameraControl\n");
-
-	}
-	else
-	{
-		pan += panRange.Min;
-		if (pan < panRange.Min)
-			pan = panRange.Min;
-		if (pan > panRange.Max)
-			pan = panRange.Max;
-		tilt += tiltRange.Min;
-		if (tilt < tiltRange.Min)
-			tilt = tiltRange.Min;
-		if (tilt > tiltRange.Max)
-			tilt = tiltRange.Max;
-		zoom += zoomRange.Min;
-		if (zoom < zoomRange.Min)
-			zoom = zoomRange.Min;
-		if (zoom > zoomRange.Max)
-			zoom = zoomRange.Max;
-
-		long Val, Flags;
-		hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
-		if (FAILED(hr))
-			printf("This device does not support focus auto/manual control\n");
-		long focusFlag = Flags;
-		long focusVal = Val;
-		focus += focusRange.Min;
-		if (focus < focusRange.Min)
-			focus = focusRange.Min;
-		if (focus > focusRange.Max)
-			focus = focusRange.Max;
-
-
-		//use CameraControl_Pan, Tilt, Zoom for absolute movement
-		hr = pCameraControl->Set(CameraControl_Pan, pan, CameraControl_Flags_Manual);
-		if (FAILED(hr))
-			printf("This device does not support pan absolute control\n");
-
-		hr = pCameraControl->Set(CameraControl_Tilt, tilt, CameraControl_Flags_Manual);
-		if (FAILED(hr))
-			printf("This device does not support tilt absolute control\n");
-
-		hr = pCameraControl->Set(CameraControl_Zoom, zoom, CameraControl_Flags_Manual);
-		if (FAILED(hr))
-			printf("This device does not support zoom absolute control\n");
-
-		if (focusFlag != CameraControl_Flags_Auto)
-		{
-			hr = pCameraControl->Set(CameraControl_Focus, focus, CameraControl_Flags_Manual);
-			if (FAILED(hr))
-				printf("This device does not support focus absolute control\n");
-		}
-
+		hr = pCameraControl->Set(prop, step, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
@@ -640,9 +477,6 @@ HRESULT UVCCameraLibrary::moveHome()
 
 	if (pDeviceFilter == NULL)
 		return E_FAIL;
-	//hr = stopMoving();
-	//hr = stopZooming();
-	//hr = stopFocusing();
 	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
@@ -653,32 +487,19 @@ HRESULT UVCCameraLibrary::moveHome()
 	}
 	else
 	{
-		long Flags, Val;
-
-		hr = pCameraControl->Get(CameraControl_Focus, &Val, &Flags);
-		if (FAILED(hr))
-			printf("This device does not support focus auto/manual control\n");
-		long focusFlag = Flags;
-		long focusVal = Val;
-
-		hr = pCameraControl->Set(CameraControl_Pan, panRange.Default, CameraControl_Flags_Manual);
+		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_PAN, panAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 		if (FAILED(hr))
 			printf("This device does not support pan absolute control\n");
 
-		hr = pCameraControl->Set(CameraControl_Tilt, tiltRange.Default, CameraControl_Flags_Manual);
+		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_TILT, tiltAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 		if (FAILED(hr))
 			printf("This device does not support tilt absolute control\n");
 
-		hr = pCameraControl->Set(CameraControl_Zoom, zoomRange.Default, CameraControl_Flags_Manual);
+		hr = pCameraControl->Set(KSPROPERTY_CAMERACONTROL_ZOOM, zoomAbsRange.Default, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
 		if (FAILED(hr))
 			printf("This device does not support zoom absolute control\n");
 
-		if (focusFlag != CameraControl_Flags_Auto)
-		{
-			hr = pCameraControl->Set(CameraControl_Focus, Val, CameraControl_Flags_Auto);
-			if (FAILED(hr))
-				printf("This device does not support focus auto/manual control\n");
-		}
+		setAuto(KSPROPERTY_CAMERACONTROL_FOCUS, true);
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
@@ -687,23 +508,53 @@ HRESULT UVCCameraLibrary::moveHome()
 
 bool UVCCameraLibrary::getAutoFocus()
 {
-	return getAuto(CameraControl_Focus);
+	return getAuto(KSPROPERTY_CAMERACONTROL_FOCUS);
 }
 long UVCCameraLibrary::getPan()
 {
-	return getVal(CameraControl_Pan);
+	return getVal(KSPROPERTY_CAMERACONTROL_PAN);
 }
 long UVCCameraLibrary::getTilt()
 {
-	return getVal(CameraControl_Tilt);
+	return getVal(KSPROPERTY_CAMERACONTROL_TILT);
 }
 long UVCCameraLibrary::getZoom()
 {
-	return getVal(CameraControl_Zoom);
+	return getVal(KSPROPERTY_CAMERACONTROL_ZOOM);
 }
 long UVCCameraLibrary::getFocus()
 {
-	return getVal(CameraControl_Focus);
+	return getVal(KSPROPERTY_CAMERACONTROL_FOCUS);
+}
+
+HRESULT UVCCameraLibrary::setAuto(long prop, bool autoEnabled)
+{
+	HRESULT hr = E_FAIL;
+
+	if (pDeviceFilter == NULL)
+		return hr;
+	IAMCameraControl* pCameraControl = 0;
+	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
+	if (FAILED(hr))
+	{
+		// The device does not support IAMCameraControl
+		printf("This device does not support IAMCameraControl\n");
+	}
+	else
+	{
+		long Val, Flags;
+		hr = pCameraControl->Get(prop, &Val, &Flags);
+		if (SUCCEEDED(hr))
+		{
+			if (autoEnabled)
+				hr = pCameraControl->Set(prop, Val, KSPROPERTY_CAMERACONTROL_FLAGS_AUTO);
+			else
+				hr = pCameraControl->Set(prop, Val, KSPROPERTY_CAMERACONTROL_FLAGS_MANUAL);
+		}
+	}
+	if (pCameraControl != NULL)
+		pCameraControl->Release();
+	return hr;
 }
 
 bool UVCCameraLibrary::getAuto(long prop)
@@ -712,16 +563,14 @@ bool UVCCameraLibrary::getAuto(long prop)
 
 	if (pDeviceFilter == NULL)
 		return false;
+
+	bool autoEnabled = false;
 	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
 		// The device does not support IAMCameraControl
-		if (pCameraControl != NULL)
-			pCameraControl->Release();
 		printf("This device does not support IAMCameraControl\n");
-		return false;
-
 	}
 	else
 	{
@@ -729,65 +578,47 @@ bool UVCCameraLibrary::getAuto(long prop)
 
 		// Get the range and default values 
 		hr = pCameraControl->Get(prop, &Val, &Flags);
-		if (pCameraControl != NULL)
-			pCameraControl->Release();
 		if (SUCCEEDED(hr))
 		{
-			if (Flags == CameraControl_Flags_Auto)
-				return true;
-			else
-				return false;
-		}
-		else
-		{
-			printf("This device does not support PTZControl\n");
-			return false;
+			if (Flags == KSPROPERTY_CAMERACONTROL_FLAGS_AUTO)
+				autoEnabled = true;
 		}
 	}
+	if (pCameraControl != NULL)
+		pCameraControl->Release();
+	return autoEnabled;
 
 }
 long UVCCameraLibrary::getVal(long prop)
 {
 	HRESULT hr = E_FAIL;
 
+	long propVal = 0;
+
 	if (pDeviceFilter == NULL)
-		return E_FAIL;
+		return propVal;
+
 	IAMCameraControl* pCameraControl = 0;
 	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
 	if (FAILED(hr))
 	{
 		// The device does not support IAMCameraControl
-		if (pCameraControl != NULL)
-			pCameraControl->Release();
 		printf("This device does not support IAMCameraControl\n");
-		return 0;
-
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags, Val;
-
-		//if (prop == CameraControl_Zoom)
-		//	printf("Zoom ...");
-		//else
-		//	printf("No zoom ...");
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		//printf("Min %d , Max %d , Step %d", Min, Max, Step);
+		long Flags, Val;
 		hr = pCameraControl->Get(prop, &Val, &Flags);
-		//printf("required value is %li \n", Val);
-		if (pCameraControl != NULL)
-			pCameraControl->Release();
 		if (SUCCEEDED(hr))
 		{
-			return Val - Min;
-		}
-		else
-		{
-			printf("This device does not support PTZControl\n");
-			return 0;
+			propVal = Val;
 		}
 	}
+
+	if (pCameraControl != NULL)
+		pCameraControl->Release();
+
+	return propVal;
 }
 
 HRESULT UVCCameraLibrary::stopMoving()
@@ -798,28 +629,10 @@ HRESULT UVCCameraLibrary::stopMoving()
 HRESULT UVCCameraLibrary::stopZooming()
 {
 	return stopControling(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE);
-	/*
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long focusVal = getFocus();
-	long zoomVal = getZoom();
-	return moveTo(panVal, tiltVal, focusVal, zoomVal);
-	*/
-	//long zoomVal = getZoom();
-	//printf("current zoom : %d", zoomVal);
-	//return stopAbsControling(CameraControl_Zoom);
 }
 HRESULT UVCCameraLibrary::stopFocusing()
 {
 	return stopControling(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE);
-	/*
-	long panVal = getPan();
-	long tiltVal = getTilt();
-	long focusVal = getFocus();
-	long zoomVal = getZoom();
-	return moveTo(panVal, tiltVal, focusVal, zoomVal);
-	*/
-	//return stopAbsControling(CameraControl_Focus);
 }
 
 HRESULT UVCCameraLibrary::stopControling(long prop)
@@ -835,20 +648,12 @@ HRESULT UVCCameraLibrary::stopControling(long prop)
 	{
 		// The device does not support IAMCameraControl
 		printf("This device does not support IAMCameraControl\n");
-
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags;
 
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		printf("Min %d , Max %d , Step %d", Min, Max, Step);
-		if (SUCCEEDED(hr))
-		{
-			hr = pCameraControl->Set(prop, 0, KSPROPERTY_CAMERACONTROL_FLAGS_RELATIVE);
-		}
-		else
+		hr = pCameraControl->Set(prop, 0, KSPROPERTY_CAMERACONTROL_FLAGS_RELATIVE);
+		if (FAILED(hr))
 		{
 			printf("Stop Controlling: This device does not support PTZControl\n");
 		}
@@ -857,43 +662,6 @@ HRESULT UVCCameraLibrary::stopControling(long prop)
 		pCameraControl->Release();
 	return hr;
 }
-
-HRESULT UVCCameraLibrary::stopAbsControling(long prop)
-{
-	HRESULT hr = E_FAIL;
-
-	if (pDeviceFilter == NULL)
-		return E_FAIL;
-
-	IAMCameraControl* pCameraControl = 0;
-	hr = pDeviceFilter->QueryInterface(IID_IAMCameraControl, (void**)&pCameraControl);
-	if (FAILED(hr))
-	{
-		// The device does not support IAMCameraControl
-		printf("This device does not support IAMCameraControl\n");
-
-	}
-	else
-	{
-		long Min, Max, Step, Default, Flags;
-
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
-		printf("Min %d , Max %d , Step %d", Min, Max, Step);
-		if (SUCCEEDED(hr))
-		{
-			hr = pCameraControl->Set(prop, 0, KSPROPERTY_CAMERACONTROL_FLAGS_ABSOLUTE);
-		}
-		else
-		{
-			printf("Stop Controlling: This device does not support PTZControl\n");
-		}
-	}
-	if (pCameraControl != NULL)
-		pCameraControl->Release();
-	return hr;
-}
-
 /*OSD menu tool*/
 HRESULT UVCCameraLibrary::osdMenuOpenClose()
 {
@@ -962,6 +730,65 @@ HRESULT UVCCameraLibrary::checkOSDMenu()
 
 	return hr;
 }
+
+bool UVCCameraLibrary::getPropRanges(long prop, uvc_ranges_t& range, IAMCameraControl* pCamControl)
+{
+	HRESULT hr = E_FAIL;
+	bool enabled = true;
+	long Min, Max, Step, Default, Flags;
+
+	// Get the range and default values 
+	hr = pCamControl->GetRange(prop, &Min, &Max, &Step, &Default, &Flags);
+	if (FAILED(hr))
+	{
+		enabled = false;
+	}
+	else
+	{
+		range.Min = Min;
+		range.Max = Max;
+		range.Default = Default;
+	}
+	return enabled;
+}
+
+void UVCCameraLibrary::getPanRanges(IAMCameraControl* pCamControl)
+{
+	panConEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_PAN_RELATIVE, panConRange, pCamControl);
+	printf("pan continuous movement enabled: %s\n", panConEnabled ? "true" : "false");
+	printf("Pan - Min %d, Max %d, Default %d\n", panConRange.Min, panConRange.Max, panConRange.Default);
+	panAbsEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_PAN, panAbsRange, pCamControl);
+	printf("pan absolute movement enabled: %s\n", panAbsEnabled ? "true" : "false");
+	printf("Pan - Min %d, Max %d, Default %d\n", panAbsRange.Min, panAbsRange.Max, panAbsRange.Default);
+}
+void UVCCameraLibrary::getTiltRanges(IAMCameraControl* pCamControl)
+{
+	tiltConEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_TILT_RELATIVE, tiltConRange, pCamControl);
+	printf("tilt continuous movement enabled: %s\n", tiltConEnabled ? "true" : "false");
+	printf("Tilt - Min %d, Max %d, Default %d\n", tiltConRange.Min, tiltConRange.Max, tiltConRange.Default);
+	tiltAbsEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_TILT, tiltAbsRange, pCamControl);
+	printf("tilt absolute movement enabled: %s\n", tiltAbsEnabled ? "true" : "false");
+	printf("Tilt - Min %d, Max %d, Default %d\n", tiltAbsRange.Min, tiltAbsRange.Max, tiltAbsRange.Default);
+}
+void UVCCameraLibrary::getZoomRanges(IAMCameraControl* pCamControl)
+{
+	zoomConEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_ZOOM_RELATIVE, zoomConRange, pCamControl);
+	printf("zoom continuous movement enabled: %s\n", zoomConEnabled ? "true" : "false");
+	printf("Zoom - Min %d, Max %d, Default %d\n", zoomConRange.Min, zoomConRange.Max, zoomConRange.Default);
+	zoomAbsEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_ZOOM, zoomAbsRange, pCamControl);
+	printf("zoom absolute movement enabled: %s\n", zoomAbsEnabled ? "true" : "false");
+	printf("Zoom - Min %d, Max %d, Default %d\n", zoomAbsRange.Min, zoomAbsRange.Max, zoomAbsRange.Default);
+}
+void UVCCameraLibrary::getFocusRanges(IAMCameraControl* pCamControl)
+{
+	focusConEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_FOCUS_RELATIVE, focusConRange, pCamControl);
+	printf("focus continuous movement enabled: %s\n", focusConEnabled ? "true" : "false");
+	printf("Focus - Min %d, Max %d, Default %d\n", focusConRange.Min, focusConRange.Max, focusConRange.Default);
+	focusAbsEnabled = getPropRanges(KSPROPERTY_CAMERACONTROL_FOCUS, focusAbsRange, pCamControl);
+	printf("focus absolute movement enabled: %s\n", focusAbsEnabled ? "true" : "false");
+	printf("Focus - Min %d, Max %d, Default %d\n", focusAbsRange.Min, focusAbsRange.Max, focusAbsRange.Default);
+}
+
 HRESULT UVCCameraLibrary::getControlRanges()
 {
 	HRESULT hr = E_FAIL;
@@ -974,38 +801,14 @@ HRESULT UVCCameraLibrary::getControlRanges()
 	{
 		// The device does not support IAMCameraControl
 		printf("This device does not support IAMCameraControl\n");
-
+		uvcEnabled = false;
 	}
 	else
 	{
-		long Min, Max, Step, Default, Flags;
-
-		// Get the range and default values 
-		hr = pCameraControl->GetRange(CameraControl_Pan, &Min, &Max, &Step, &Default, &Flags);
-		panRange.Min = Min;
-		panRange.Max = Max;
-		panRange.Default = Default;
-		hr = pCameraControl->GetRange(CameraControl_Tilt, &Min, &Max, &Step, &Default, &Flags);
-		tiltRange.Min = Min;
-		tiltRange.Max = Max;
-		tiltRange.Default = Default;
-		hr = pCameraControl->GetRange(CameraControl_Zoom, &Min, &Max, &Step, &Default, &Flags);
-		zoomRange.Min = Min;
-		zoomRange.Max = Max;
-		zoomRange.Default = Default;
-		hr = pCameraControl->GetRange(CameraControl_Focus, &Min, &Max, &Step, &Default, &Flags);
-		focusRange.Min = Min;
-		focusRange.Max = Max;
-		focusRange.Default = Default;
-
-		if (SUCCEEDED(hr))
-		{
-
-		}
-		else
-		{
-			printf("This device does not support PTZControl\n");
-		}
+		getPanRanges(pCameraControl);
+		getTiltRanges(pCameraControl);
+		getZoomRanges(pCameraControl);
+		getFocusRanges(pCameraControl);
 	}
 	if (pCameraControl != NULL)
 		pCameraControl->Release();
@@ -1025,12 +828,12 @@ void UVCCameraLibrary::getCameraInfo(TCHAR* devicePath)
 		"\\\\?\\usb#vid_%x&pid_%x",
 		&ven, &dev) != 2)
 	{
-		printf("Failed to get camera information");
+		printf("Failed to get camera information\n");
 	}
 
 	vendorId = ven;
 	productId = dev;
 	
-	printf("vid_%x pid_%x", ven, dev);
+	printf("vid_%x pid_%x\n", ven, dev);
 }
 /********************************************************End of UVCCameraLibrary class************************************************************/

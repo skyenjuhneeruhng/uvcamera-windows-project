@@ -24,58 +24,21 @@ int main()
 		printf("%s\n", deviceNames[i]);
 	}
 	UVCCameraLibrary lib;
-	char devname[256];
-	strcpy_s(devname , "PTZ Optics Camera");//PTZ Optics Camera//OBS Virtual Camera
-	if (lib.connectDevice(devname))
+	int camIndex = 0;
+	printf("Enter the camera index to test\n");
+	scanf_s("%d", &camIndex);//does not work if you put strings not related input format
+	printf("Entered index is %d\n", camIndex);
+	printf("Selected camera name %s\n", deviceNames[((camIndex<devices)?camIndex:0)]);
+	if (lib.connectDevice(deviceNames[((camIndex < devices) ? camIndex : 0)]))
 	{
-		
-		char a = 'a';
-		scanf_s("enter a to test \n %c", &a);
-		printf_s("entered character is %c", a);
-		if (a == 'a')
-		{
-			HRESULT hr;
-			for(int i = 0 ; i < 10 ; i ++)
-				hr = lib.zoomOneIn(10);
-			//for (int i = 0; i < 50000; i++);
-			//hr = lib.zoomOneIn(10);
-			//hr = lib.moveHome();
-			/*hr = lib.moveTiltOneTop(5);
-			if (SUCCEEDED(hr))
-				printf("Successed\n");
-			hr = lib.zoomOneIn(5);
-			if (SUCCEEDED(hr))
-				printf("Successed\n");
-			hr = lib.focusOneIn(5);
-			if (SUCCEEDED(hr))
-				printf("Successed\n");
-
-			hr = lib.moveHome();
-			if(SUCCEEDED(hr))
-				printf("Successed\n");
-
-			printf("pan %d, tilt %d, zoom %d, focus %d\n", lib.getPan(), lib.getTilt(), lib.getZoom(), lib.getFocus());
-			lib.setAutoFocus(false);
-			if (lib.getAutoFocus())
-				printf("Focus Auto\n");
-			lib.setAutoFocus(true);
-			if (lib.getAutoFocus())
-				printf("Focus Auto\n");
-			hr = lib.zoomOneIn(1000);*/
-		}
-		else
-		{
-			printf_s("wrong character has been entered");
-		}
-		
+	
 	}
 	else
 	{
-		printf_s("Can not connect device");
+		printf("Can not connect device");
 	}
-
-	char a = 0;
-	scanf_s("$c", &a);
+	while (true);
+	
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

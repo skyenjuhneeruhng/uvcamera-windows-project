@@ -1,13 +1,7 @@
 ﻿  pch.cpp
   LibraryTester.cpp
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(33,11): warning C4473: 'scanf_s' : not enough arguments passed for format string
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(33,11): message : placeholders and their parameters expect 2 variadic arguments, but 1 were provided
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(33,11): message : the missing variadic argument 2 is required by format string '%c'
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(33,11): message : this argument is used as a buffer size
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(78,16): warning C4474: 'scanf_s' : too many arguments passed for format string
-G:\CWorks\UVCCameraDLL\uvcamera-windows-project\LibraryTester\LibraryTester.cpp(78,16): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
   Generating code
   Previous IPDB not found, fall back to full compilation.
-  All 10 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 7 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   LibraryTester.vcxproj -> G:\CWorks\UVCCameraDLL\uvcamera-windows-project\x64\Release\LibraryTester.exe
