@@ -786,6 +786,80 @@ void UVCCameraLibrary::getFocusRanges(IAMCameraControl* pCamControl)
 	printf("Focus - Min %d, Max %d, Default %d\n", focusAbsRange.Min, focusAbsRange.Max, focusAbsRange.Default);
 }
 
+uvc_ranges_t UVCCameraLibrary::getPanCtrlRanges()
+{
+	if (panConEnabled)
+		return panConRange;
+
+	if (panAbsEnabled)
+	{
+		uvc_ranges_t ctrlRange = {
+			1,
+			20,
+			7
+		};
+
+		return ctrlRange;
+	}
+
+	return DEFAULT_RANGES;
+}
+uvc_ranges_t UVCCameraLibrary::getTiltCtrlRanges()
+{
+	if (tiltConEnabled)
+		return tiltConRange;
+
+	if (tiltAbsEnabled)
+	{
+		uvc_ranges_t ctrlRange = {
+			1,
+			20,
+			7
+		};
+
+		return ctrlRange;
+	}
+
+	return DEFAULT_RANGES;
+}
+uvc_ranges_t UVCCameraLibrary::getZoomCtrlRanges()
+{
+	if (zoomConEnabled)
+		return zoomConRange;
+
+	if (zoomAbsEnabled)
+	{
+		uvc_ranges_t ctrlRange = {
+			1,
+			20,
+			7
+		};
+
+		return ctrlRange;
+	}
+
+	return DEFAULT_RANGES;
+}
+uvc_ranges_t UVCCameraLibrary::getFocusCtrlRanges()
+{
+	if (focusConEnabled)
+		return focusConRange;
+
+	if (focusAbsEnabled)
+	{
+		uvc_ranges_t ctrlRange = {
+			1,
+			20,
+			7
+		};
+
+		return ctrlRange;
+	}
+
+	return DEFAULT_RANGES;
+}
+
+
 HRESULT UVCCameraLibrary::getControlRanges()
 {
 	HRESULT hr = E_FAIL;

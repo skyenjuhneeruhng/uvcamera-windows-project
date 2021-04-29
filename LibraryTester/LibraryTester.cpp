@@ -31,7 +31,14 @@ int main()
 	printf("Selected camera name %s\n", deviceNames[((camIndex<devices)?camIndex:0)]);
 	if (lib.connectDevice(deviceNames[((camIndex < devices) ? camIndex : 0)]))
 	{
-	
+		uvc_ranges_t panRange = lib.getPanCtrlRanges();
+		printf("Min %d, Max %d, Default %d\n", panRange.Min, panRange.Max, panRange.Default);
+		uvc_ranges_t tiltRange = lib.getTiltCtrlRanges();
+		printf("Min %d, Max %d, Default %d\n", tiltRange.Min, tiltRange.Max, tiltRange.Default);
+		uvc_ranges_t zoomRange = lib.getZoomCtrlRanges();
+		printf("Min %d, Max %d, Default %d\n", zoomRange.Min, zoomRange.Max, zoomRange.Default);
+		uvc_ranges_t focusRange = lib.getFocusCtrlRanges();
+		printf("Min %d, Max %d, Default %d\n", focusRange.Min, focusRange.Max, focusRange.Default);
 	}
 	else
 	{

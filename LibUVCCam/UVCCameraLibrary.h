@@ -20,9 +20,9 @@ typedef struct {
 }uvc_ranges_t;
 
 const uvc_ranges_t DEFAULT_RANGES = {
-		0,
-		0,
-		0
+	0,
+	0,
+	0
 };
 
 class UVCCAMERAAPI UVCCameraLibrary
@@ -84,6 +84,12 @@ public:
 
 	//This function must be called after connection to use other functions for osd menu
 	HRESULT checkOSDMenu();//check if the uvc camera supports osd menu
+
+	uvc_ranges_t getPanCtrlRanges();
+	uvc_ranges_t getTiltCtrlRanges();
+	uvc_ranges_t getZoomCtrlRanges();
+	uvc_ranges_t getFocusCtrlRanges();
+
 private:
 
 	//base directshow filter
